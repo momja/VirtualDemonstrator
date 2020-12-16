@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace VirtualDemonstrator
 {
+
+    public enum InteractionModes {
+        Create,
+        Present
+    }
     /// <summary>
     /// Main Driver class for the virtual demonstrator.
     /// Choreographs interactions between various components.
@@ -22,6 +27,7 @@ namespace VirtualDemonstrator
         {
             this._stateHistory = new List<WorkspaceState>();
             this._visualElements = new List<VisualElement>();
+            this.timeline.workspace = this;
         }
 
         // Update is called once per frame
@@ -76,5 +82,9 @@ namespace VirtualDemonstrator
             this._curState.updateAllStates(1);
         }
 
+        public void toggleMode(InteractionModes mode) {
+            // Handle change in mode
+            print("toggling");
+        }
     }
 }
