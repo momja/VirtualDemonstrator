@@ -15,6 +15,8 @@ namespace VirtualDemonstrator
         private List<WorkspaceState> _stateHistory;
         private List<VisualElement> _visualElements;
 
+        private WorkspaceState _curState;
+
         // Start is called before the first frame update
         private void Start()
         {
@@ -66,6 +68,12 @@ namespace VirtualDemonstrator
         {
             int timeIndex = this.timeline.getTimeIndex(time);
             return this._stateHistory[timeIndex];
+        }
+
+        public void updateCurrentState(int frame) {
+            this._curState = this._stateHistory[frame];
+            // set the transforms
+            this._curState.updateAllStates(1);
         }
 
     }
