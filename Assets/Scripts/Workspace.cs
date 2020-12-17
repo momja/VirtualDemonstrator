@@ -17,16 +17,17 @@ namespace VirtualDemonstrator
     {
         public MenuPanel menuPanel;
         public Timeline timeline;
-        private List<WorkspaceState> _stateHistory;
-        private List<VisualElement> _visualElements;
+        private List<WorkspaceState> stateHistory_;
+        private List<GameObject> visualElements_;
 
         private WorkspaceState _curState;
 
         // Start is called before the first frame update
         private void Start()
         {
-            this._stateHistory = new List<WorkspaceState>();
-            this._visualElements = new List<VisualElement>();
+            this.stateHistory_ = new List<WorkspaceState>();
+            // this.visualElements_ = new List<VisualElement>();
+            this.visualElements_ = new List<GameObject>();
             this.timeline.workspace = this;
         }
 
@@ -36,23 +37,27 @@ namespace VirtualDemonstrator
 
         }
 
-        public void insertNewState(WorkspaceState state, int index = -1)
+        // This function
+        public void InsertNewState(int index = -1)
         {
+            // Create the new state based on the current workspace conditions.
+            WorkspaceState state = new WorkspaceState(visualElements_);
+
             if (index < 0)
             {
                 // Set to end
-                this._stateHistory.Add(state);
+                this.stateHistory_.Add(state);
             }
             else
             {
-                this._stateHistory.Insert(index, state);
+                this.stateHistory_.Insert(index, state);
             }
             this.timeline.stateCount += 1;
         }
 
-        public bool deleteState(WorkspaceState state)
+        public bool DeleteState(WorkspaceState state)
         {
-            bool result = this._stateHistory.Remove(state);
+            bool result = this.stateHistory_.Remove(state);
             if (result)
             {
                 this.timeline.stateCount -= 1;
@@ -60,24 +65,24 @@ namespace VirtualDemonstrator
             return result;
         }
 
-        public bool deleteState(int index)
+        public bool DeleteState(int index)
         {
-            if (index < 0 || index >= this._stateHistory.Count)
+            if (index < 0 || index >= this.stateHistory_.Count)
             {
                 return false;
             }
-            this._stateHistory.RemoveAt(index);
+            this.stateHistory_.RemoveAt(index);
             return true;
         }
 
-        public WorkspaceState getStateAtTime(float time)
+        public WorkspaceState GetStateAtTime(float time)
         {
             int timeIndex = this.timeline.getTimeIndex(time);
-            return this._stateHistory[timeIndex];
+            return this.stateHistory_[timeIndex];
         }
 
         public void updateCurrentState(int frame) {
-            this._curState = this._stateHistory[frame];
+            this._curState = this.stateHistory_[frame];
             // set the transforms
             this._curState.updateAllStates(1);
         }

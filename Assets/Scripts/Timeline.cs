@@ -5,7 +5,7 @@ using UnityEngine;
 namespace VirtualDemonstrator {
     public class Timeline : MonoBehaviour {
         
-        public toggleModeButton toggleButton;
+        // public toggleModeButton toggleButton;
         public Workspace workspace;
         public const float maxTime = 1;
         public float curTime;
@@ -14,7 +14,7 @@ namespace VirtualDemonstrator {
         private void Start() {
             this.curTime = 0;
             this.stateCount = 0;
-            this.toggleButton.delegator = this;
+            // this.toggleButton.delegator = this;
         }
 
         private void Update() {
