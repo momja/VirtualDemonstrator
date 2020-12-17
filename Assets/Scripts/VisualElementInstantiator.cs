@@ -6,11 +6,6 @@ public class VisualElementInstantiator : MonoBehaviour
 {
     public GameObject visualElementPrefab;
 
-    void Awake()
-    {
-        
-    }
-
     public void InstantiateVisualElement()
     {
         GameObject visualElement = Instantiate(visualElementPrefab, transform.position, transform.rotation);
