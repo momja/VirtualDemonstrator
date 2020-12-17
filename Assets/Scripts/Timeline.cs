@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace VirtualDemonstrator {
     public class Timeline : MonoBehaviour {
@@ -10,15 +11,20 @@ namespace VirtualDemonstrator {
         public const float maxTime = 1;
         public float curTime;
         public int stateCount;
+        public TimelineSlider slider;
 
         private void Start() {
             this.curTime = 0;
             this.stateCount = 0;
-            // this.toggleButton.delegator = this;
+            this.slider.timelineDelegate = this;
         }
 
         private void Update() {
             
+        }
+
+        public void pointerUp() {
+            this.workspace.OnTimelineChanged(slider.GetComponent<Slider>().value);
         }
 
         public int getTimeIndex(float time) {
