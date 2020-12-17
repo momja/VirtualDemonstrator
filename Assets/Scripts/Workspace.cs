@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace VirtualDemonstrator
 {
+
+    public enum InteractionModes {
+        Create,
+        Present
+    }
     /// <summary>
     /// Main Driver class for the virtual demonstrator.
     /// Choreographs interactions between various components.
@@ -13,13 +18,17 @@ namespace VirtualDemonstrator
         public MenuPanel menuPanel;
         public Timeline timeline;
         private List<WorkspaceState> stateHistory_;
-        private List<GameObject> elementObjects_;
+        private List<GameObject> visualElements_;
+
+        private WorkspaceState _curState;
 
         // Start is called before the first frame update
         private void Start()
         {
             this.stateHistory_ = new List<WorkspaceState>();
-            this.elementObjects_ = new List<GameObject>();
+            // this.visualElements_ = new List<VisualElement>();
+            this.visualElements_ = new List<GameObject>();
+            this.timeline.workspace = this;
         }
 
         // Update is called once per frame
@@ -32,7 +41,7 @@ namespace VirtualDemonstrator
         public void InsertNewState(int index = -1)
         {
             // Create the new state based on the current workspace conditions.
-            WorkspaceState state = new WorkspaceState(elementObjects_);
+            WorkspaceState state = new WorkspaceState(visualElements_);
 
             if (index < 0)
             {
@@ -70,6 +79,17 @@ namespace VirtualDemonstrator
         {
             int timeIndex = this.timeline.getTimeIndex(time);
             return this.stateHistory_[timeIndex];
+        }
+
+        public void updateCurrentState(int frame) {
+            this._curState = this.stateHistory_[frame];
+            // set the transforms
+            this._curState.updateAllStates(1);
+        }
+
+        public void toggleMode(InteractionModes mode) {
+            // Handle change in mode
+            print("toggling");
         }
     }
 }

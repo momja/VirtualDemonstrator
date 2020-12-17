@@ -9,7 +9,7 @@ namespace VirtualDemonstrator {
         {
             elementObject_ = elementObject;
             stateMaterial_ = elementObject_.GetComponent<Renderer>().material;
-            stateTransform_ = elementObject_.transform; 
+            stateTransform_ = elementObject_.transform;
         }
 
         // This function assigns a blend of this state with another.
@@ -18,7 +18,7 @@ namespace VirtualDemonstrator {
             // A t-value of 0 will assign the state stored in the caller.
             // A t-value of 1 will assign the state passed into the function.
             // A t-value between 0 and 1 will assign a blend of the two states.
-            if (t >= 0 && t <= 1) { 
+            if (t >= 0 && t <= 1) {
                 // Interpolate the transform values and assign them.
                 Transform secondTransform = secondState.GetStateTransform();
                 Vector3 lerpedPosition = Vector3.Lerp(this.stateTransform_.localPosition, secondTransform.localPosition, t);
@@ -43,6 +43,6 @@ namespace VirtualDemonstrator {
         // at the time the state was instantiated.
         private GameObject elementObject_;
         private Material stateMaterial_;
-        private Transform stateTransform_; 
+        private Transform stateTransform_;
     }
 }
