@@ -5,11 +5,11 @@ using System.Collections.Generic;
 namespace VirtualDemonstrator {
     public class VisualElementState {
         // A constructor that takes in a game object and saves its current material and transform.
-        public VisualElementState(GameObject elementObject)
+        public VisualElementState(VisualElement element)
         {
-            elementObject_ = elementObject;
-            stateMaterial_ = elementObject_.GetComponent<Renderer>().material;
-            stateTransform_ = elementObject_.transform;
+            this.element_ = element;
+            stateMaterial_ = element.gameObject.GetComponent<Renderer>().material;
+            stateTransform_ = element.gameObject.transform;
         }
 
         // This function assigns a blend of this state with another.
@@ -24,24 +24,24 @@ namespace VirtualDemonstrator {
                 Vector3 lerpedPosition = Vector3.Lerp(this.stateTransform_.localPosition, secondTransform.localPosition, t);
                 Vector3 lerpedScale = Vector3.Lerp(this.stateTransform_.localScale, secondTransform.localScale, t);
                 Quaternion lerpedRotation = Quaternion.Slerp(this.stateTransform_.localRotation, secondTransform.localRotation, t);
-                elementObject_.transform.localPosition = lerpedPosition;
-                elementObject_.transform.localScale = lerpedScale;
-                elementObject_.transform.localRotation = lerpedRotation;
+                element_.gameObject.transform.localPosition = lerpedPosition;
+                element_.gameObject.transform.localScale = lerpedScale;
+                element_.gameObject.transform.localRotation = lerpedRotation;
 
                 // Lerp the main colors of each material and assign it.
                 Color lerpedColor = Color.Lerp(this.stateMaterial_.color, secondState.GetStateMaterial().color, t);
-                elementObject_.GetComponent<Renderer>().material.color = lerpedColor;
+                element_.gameObject.GetComponent<Renderer>().material.color = lerpedColor;
             }
         }
 
         // Getter functions for the state's data.
-        public GameObject GetStateObject() { return elementObject_; }
+        public VisualElement GetStateObject() { return element_; }
         public Material GetStateMaterial() { return stateMaterial_; }
         public Transform GetStateTransform() { return stateTransform_; }
 
         // Each visual state keeps track of the correspending element's transform and material
         // at the time the state was instantiated.
-        private GameObject elementObject_;
+        private VisualElement element_;
         private Material stateMaterial_;
         private Transform stateTransform_;
     }

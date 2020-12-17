@@ -4,62 +4,53 @@ using System.Collections.Generic;
 
 namespace VirtualDemonstrator {
     public class WorkspaceState {
-        public WorkspaceState(List<GameObject> elementObjects)
-        {
-            // Create VisualElements that correspond to each GameObject.
-            visualElements_ = new List<VisualElement>();
-            for (int i = 0; i < elementObjects.Count; i++)
-            {
-                visualElements_.Add(new VisualElement(elementObjects[i]));
-            }
+        public WorkspaceState() {
+            this.visualElements_ = new List<VisualElement>();
+            this.elementStates = new Dictionary<VisualElement, VisualElementState>();
+        }
+
+        public WorkspaceState(WorkspaceState prevState) {
+            // foreach(ele)
         }
 
         // This function checks whether a given element exists in the workspace state based on its object.
         // If so, its index is returned.
-        public int ElementExists(GameObject elementObject)
+        public bool ElementExists(VisualElement element)
         {
-            for (int i = 0; i < visualElements_.Count; i++)
-            {
-                if (visualElements_[i].GetElementObject() == elementObject)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
+            return this.elementStates.ContainsKey(element);
         }
 
-        // This functions updates/adds new elements as a state in the workspace.
-        public void AddState(List<GameObject> elementObjects)
+        // This functions updates/adds new element as a state in the workspace.
+        public void AddState(VisualElement element)
         {
-            // Either append a new state to each element or create new elements.
-            for (int i = 0; i < elementObjects.Count; i++)
-            {
-                int index = ElementExists(elementObjects[i]);
-                if (index != -1)
-                {
-                    visualElements_[index].AddState();
-                }
-                else
-                {
-                    visualElements_.Add(new VisualElement(elementObjects[i]));
-                }
+            VisualElementState newState = new VisualElementState(element);
+            if (!this.ElementExists(element)) {
+                visualElements_.Add(element);
+                elementStates.Add(element, newState);
+            }
+            else {
+                elementStates[element] = newState;
             }
         }
 
         private List<VisualElement> visualElements_;
 
-        public List<VisualElementState> elementStates;
+        public Dictionary<VisualElement, VisualElementState> elementStates;
 
-        public WorkspaceState() {
-            this.elementStates = new List<VisualElementState>();
-        }
-
-        public void updateAllStates(float t) {
+        public void updateAllStates(WorkspaceState prevState, float t) {
             // t is used as the interpolation parameter.
-            foreach(VisualElementState vizState in this.elementStates) {
-                // set new transform for visual element
-                // vizState.setVizElementToState(t);
+            foreach(VisualElement element in this.elementStates.Keys) {
+                if (prevState.ElementExists(element)) {
+                    // Interpolate between states
+                }
+                else {
+                    // Enable
+                }
+            }
+            foreach(VisualElement element in prevState.elementStates.Keys) {
+                if (!this.ElementExists(element)) {
+                    // Disable
+                }
             }
         }
     }

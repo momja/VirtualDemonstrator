@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace VirtualDemonstrator
 {
@@ -14,7 +15,7 @@ namespace VirtualDemonstrator
     /// Main Driver class for the virtual demonstrator.
     /// Choreographs interactions between various components.
     /// </summary>
-    public class Workspace : MonoBehaviour
+    public class Workspace : MonoBehaviour, IPointerUpHandler
     {
         public MenuPanel menuPanel;
         public Timeline timeline;
@@ -23,7 +24,9 @@ namespace VirtualDemonstrator
         private List<GameObject> visualElements_;
         private float prevSliderValue;
 
+        private WorkspaceState _prevState;
         private WorkspaceState _curState;
+        private bool isLerping = false;
 
         // Start is called before the first frame update
         private void Start()
@@ -33,7 +36,7 @@ namespace VirtualDemonstrator
             this.visualElements_ = new List<GameObject>();
             this.timeline.workspace = this;
             this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
-            this.timelineSlider.onValueChanged.AddListener(delegate { StateChange(); });
+            // this.timelineSlider.OnPointerUp.AddListener(delegate { OnSliderChanged(); });
         }
 
         // Update is called once per frame
@@ -42,16 +45,21 @@ namespace VirtualDemonstrator
         
         }
 
-        private void StateChange()
+        public void OnPointerUp(PointerEventData eventData)
         {
-            _curState = GetStateAtTime(this.timelineSlider.value);
+            if (!isLerping) {
+                print("testing");
+                this._prevState = this._curState;
+                _curState = GetStateAtTime(this.timelineSlider.value);
+                this.updateCurrentState();
+            }
         }
 
         // This function
         public void InsertNewState(int index = -1)
         {
             // Create the new state based on the current workspace conditions.
-            WorkspaceState state = new WorkspaceState(visualElements_);
+            WorkspaceState state = new WorkspaceState();
 
             if (index < 0)
             {
@@ -91,10 +99,9 @@ namespace VirtualDemonstrator
             return this.stateHistory_[stateIndex];
         }
 
-        public void updateCurrentState(int frame) {
-            this._curState = this.stateHistory_[frame];
+        public void updateCurrentState() {
             // set the transforms
-            this._curState.updateAllStates(1);
+            this._curState.updateAllStates(this._prevState, 1);
         }
 
         public void toggleMode(InteractionModes mode) {

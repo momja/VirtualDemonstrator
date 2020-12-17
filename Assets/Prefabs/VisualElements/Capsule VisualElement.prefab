@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7260563281339276009}
   - component: {fileID: 7260563281339276008}
   - component: {fileID: 7260563281339276011}
+  - component: {fileID: -3022691348866939412}
   m_Layer: 9
   m_Name: Capsule VisualElement
   m_TagString: Untagged
@@ -189,3 +190,15 @@ MonoBehaviour:
   m_ThrowAngularVelocityScale: 1
   m_GravityOnDetach: 0
   m_RetainTransformParent: 1
+--- !u!114 &-3022691348866939412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7260563281339276010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e82b0f6714d6ff945afd07c9333e2a3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
