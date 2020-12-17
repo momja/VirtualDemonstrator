@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace VirtualDemonstrator
 {
@@ -17,8 +18,10 @@ namespace VirtualDemonstrator
     {
         public MenuPanel menuPanel;
         public Timeline timeline;
+        public Slider timelineSlider;
         private List<WorkspaceState> stateHistory_;
         private List<GameObject> visualElements_;
+        private float prevSliderValue;
 
         private WorkspaceState _curState;
 
@@ -29,12 +32,19 @@ namespace VirtualDemonstrator
             // this.visualElements_ = new List<VisualElement>();
             this.visualElements_ = new List<GameObject>();
             this.timeline.workspace = this;
+            this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
+            this.timelineSlider.onValueChanged.AddListener(delegate { StateChange(); });
         }
 
         // Update is called once per frame
         private void Update()
         {
+        
+        }
 
+        private void StateChange()
+        {
+            _curState = GetStateAtTime(this.timelineSlider.value);
         }
 
         // This function
@@ -77,8 +87,8 @@ namespace VirtualDemonstrator
 
         public WorkspaceState GetStateAtTime(float time)
         {
-            int timeIndex = this.timeline.getTimeIndex(time);
-            return this.stateHistory_[timeIndex];
+            int stateIndex = Mathf.RoundToInt(time * this.stateHistory_.Count);
+            return this.stateHistory_[stateIndex];
         }
 
         public void updateCurrentState(int frame) {
