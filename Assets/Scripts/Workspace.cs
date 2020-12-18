@@ -34,6 +34,7 @@ namespace VirtualDemonstrator
             // this.visualElements_ = new List<VisualElement>();
             this.visualElements_ = new List<VisualElement>();
             this.timeline.workspace = this;
+            this.menuPanel.workspace_ = this;
             // this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
             // this.timelineSlider.OnPointerUp.AddListener(delegate { OnSliderChanged(); });
             InsertNewState();
@@ -123,6 +124,11 @@ namespace VirtualDemonstrator
         public void toggleMode(InteractionModes mode) {
             // Handle change in mode
             print("toggling");
+        }
+
+        public WorkspaceState GetCurrentState()
+        {
+            return this._curState;
         }
     }
 }

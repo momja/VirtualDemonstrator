@@ -9,9 +9,9 @@ namespace VirtualDemonstrator {
         {
             this.element_ = element;
             stateColor_ = element.gameObject.GetComponent<Renderer>().material.color;
-            statePosition_ = element.gameObject.transform.localPosition;
+            statePosition_ = element.gameObject.transform.position;
             stateScale_ = element.gameObject.transform.localScale;
-            stateRotation_ = element.gameObject.transform.localRotation;
+            stateRotation_ = element.gameObject.transform.rotation;
         }
 
         public VisualElementState(VisualElementState newState)
@@ -38,9 +38,9 @@ namespace VirtualDemonstrator {
                 Vector3 lerpedPosition = Vector3.Lerp(this.statePosition_, secondPosition, t);
                 Vector3 lerpedScale = Vector3.Lerp(this.stateScale_, secondScale, t);
                 Quaternion lerpedRotation = Quaternion.Slerp(this.stateRotation_, secondRotation, t);
-                element_.gameObject.transform.localPosition = lerpedPosition;
+                element_.gameObject.transform.position = lerpedPosition;
                 element_.gameObject.transform.localScale = lerpedScale;
-                element_.gameObject.transform.localRotation = lerpedRotation;
+                element_.gameObject.transform.rotation = lerpedRotation;
 
                 // Lerp the main colors of each material and assign it.
 

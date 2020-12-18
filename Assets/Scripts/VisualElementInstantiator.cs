@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VisualElementInstantiator : MonoBehaviour
+namespace VirtualDemonstrator
 {
-    public GameObject visualElementPrefab;
-
-    public void InstantiateVisualElement()
+    public class VisualElementInstantiator : MonoBehaviour
     {
-        GameObject visualElement = Instantiate(visualElementPrefab, transform.position, transform.rotation);
-        visualElement.transform.localScale = transform.localScale * 3f;
+        public GameObject visualElementPrefab;
+
+        public void InstantiateVisualElement()
+        {
+            GameObject visualElement = Instantiate(visualElementPrefab, transform.position, transform.rotation);
+            visualElement.transform.localScale = transform.localScale * 3f;
+            menu_.AddElement(visualElement.GetComponent<VisualElement>());
+        }
+
+        public MenuPanel menu_;
     }
 }
