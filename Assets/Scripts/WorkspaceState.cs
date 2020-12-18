@@ -5,12 +5,15 @@ using System.Collections.Generic;
 namespace VirtualDemonstrator {
     public class WorkspaceState {
         public WorkspaceState() {
-            this.visualElements_ = new List<VisualElement>();
             this.elementStates = new Dictionary<VisualElement, VisualElementState>();
         }
 
         public WorkspaceState(WorkspaceState prevState) {
-            // foreach(ele)
+            foreach(VisualElement element in prevState.elementStates.Keys) {
+                VisualElementState elementState = prevState.elementStates[element];
+                VisualElementState newElementState = new VisualElementState(elementState);
+                this.elementStates.Add(element, newElementState);
+            }
         }
 
         // This function checks whether a given element exists in the workspace state based on its object.
@@ -25,15 +28,12 @@ namespace VirtualDemonstrator {
         {
             VisualElementState newState = new VisualElementState(element);
             if (!this.ElementExists(element)) {
-                visualElements_.Add(element);
                 elementStates.Add(element, newState);
             }
             else {
                 elementStates[element] = newState;
             }
         }
-
-        private List<VisualElement> visualElements_;
 
         public Dictionary<VisualElement, VisualElementState> elementStates;
 

@@ -22,7 +22,7 @@ namespace VirtualDemonstrator
         private List<WorkspaceState> stateHistory_;
         private List<GameObject> visualElements_;
         private float prevSliderValue;
-
+        private int stateIndex;
         private WorkspaceState _prevState;
         private WorkspaceState _curState;
         private bool isLerping = false;
@@ -49,7 +49,9 @@ namespace VirtualDemonstrator
             if (!isLerping) {
                 Debug.Log(t);
                 this._prevState = this._curState;
-                _curState = GetStateAtTime(t);
+                int index = Mathf.RoundToInt(t * this.stateHistory_.Count);
+                this.stateIndex = index;
+                _curState = GetStateAtTime(index);
                 if (this._curState != null) {
                     this.updateCurrentState();
                 }
@@ -60,7 +62,9 @@ namespace VirtualDemonstrator
         public void InsertNewState(int index = -1)
         {
             // Create the new state based on the current workspace conditions.
-            WorkspaceState state = new WorkspaceState();
+            WorkspaceState state = new WorkspaceState(this._curState);
+            this._prevState = this._curState;
+            this._curState = state;
 
             if (index < 0)
             {
@@ -94,12 +98,11 @@ namespace VirtualDemonstrator
             return true;
         }
 
-        public WorkspaceState GetStateAtTime(float time)
+        public WorkspaceState GetStateAtTime(int stateIndex)
         {
             if (this.stateHistory_.Count == 0) {
                 return null;
             }
-            int stateIndex = Mathf.RoundToInt(time * this.stateHistory_.Count);
             return this.stateHistory_[stateIndex];
         }
 
