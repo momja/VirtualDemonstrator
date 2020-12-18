@@ -8,8 +8,20 @@ namespace VirtualDemonstrator {
         public VisualElementState(VisualElement element)
         {
             this.element_ = element;
-            stateMaterial_ = element.gameObject.GetComponent<Renderer>().material;
-            stateTransform_ = element.gameObject.transform;
+            stateColor_ = element.gameObject.GetComponent<Renderer>().material.color;
+            statePosition_ = element.gameObject.transform.localPosition;
+            stateScale_ = element.gameObject.transform.localScale;
+            stateRotation_ = element.gameObject.transform.localRotation;
+        }
+
+        public VisualElementState(VisualElementState newState)
+        {
+            this.element_ = newState.GetStateElement();
+            this.statePosition_ = newState.GetStatePosition();
+            this.stateScale_ = newState.GetStateScale();
+            this.stateRotation_ = newState.GetStateRotation();
+            this.stateColor_ = newState.GetStateColor();
+
         }
 
         // This function assigns a blend of this state with another.
@@ -20,29 +32,37 @@ namespace VirtualDemonstrator {
             // A t-value between 0 and 1 will assign a blend of the two states.
             if (t >= 0 && t <= 1) {
                 // Interpolate the transform values and assign them.
-                Transform secondTransform = secondState.GetStateTransform();
-                Vector3 lerpedPosition = Vector3.Lerp(this.stateTransform_.localPosition, secondTransform.localPosition, t);
-                Vector3 lerpedScale = Vector3.Lerp(this.stateTransform_.localScale, secondTransform.localScale, t);
-                Quaternion lerpedRotation = Quaternion.Slerp(this.stateTransform_.localRotation, secondTransform.localRotation, t);
+                Vector3 secondPosition = secondState.GetStatePosition();
+                Vector3 secondScale = secondState.GetStateScale();
+                Quaternion secondRotation = secondState.GetStateRotation();
+                Vector3 lerpedPosition = Vector3.Lerp(this.statePosition_, secondPosition, t);
+                Vector3 lerpedScale = Vector3.Lerp(this.stateScale_, secondScale, t);
+                Quaternion lerpedRotation = Quaternion.Slerp(this.stateRotation_, secondRotation, t);
                 element_.gameObject.transform.localPosition = lerpedPosition;
                 element_.gameObject.transform.localScale = lerpedScale;
                 element_.gameObject.transform.localRotation = lerpedRotation;
 
                 // Lerp the main colors of each material and assign it.
-                Color lerpedColor = Color.Lerp(this.stateMaterial_.color, secondState.GetStateMaterial().color, t);
+
+                Color lerpedColor = Color.Lerp(this.stateColor_, secondState.GetStateColor(), t);
                 element_.gameObject.GetComponent<Renderer>().material.color = lerpedColor;
             }
         }
 
         // Getter functions for the state's data.
-        public VisualElement GetStateObject() { return element_; }
-        public Material GetStateMaterial() { return stateMaterial_; }
-        public Transform GetStateTransform() { return stateTransform_; }
+        public VisualElement GetStateElement() { return element_; }
+        public Color GetStateColor() { return stateColor_; }
+        public Vector3 GetStatePosition() { return statePosition_; }
+        public Vector3 GetStateScale() { return stateScale_; }
+        public Quaternion GetStateRotation() { return stateRotation_; }
 
         // Each visual state keeps track of the correspending element's transform and material
         // at the time the state was instantiated.
         private VisualElement element_;
-        private Material stateMaterial_;
-        private Transform stateTransform_;
+        private Color stateColor_;
+        private Vector3 statePosition_;
+        private Vector3 stateScale_;
+        private Quaternion stateRotation_;
+        
     }
 }

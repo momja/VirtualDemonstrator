@@ -40,11 +40,14 @@ namespace VirtualDemonstrator {
         public void updateAllStates(WorkspaceState prevState, float t) {
             // t is used as the interpolation parameter.
             foreach(VisualElement element in this.elementStates.Keys) {
+                VisualElementState curElementState = elementStates[element];
                 if (prevState.ElementExists(element)) {
                     // Interpolate between states
+                    VisualElementState prevElementState = prevState.elementStates[element];
+                    prevElementState.BlendStates(curElementState, t);
                 }
                 else {
-                    // Enable
+                    
                 }
             }
             foreach(VisualElement element in prevState.elementStates.Keys) {
