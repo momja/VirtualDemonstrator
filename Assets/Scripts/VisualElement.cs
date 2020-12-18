@@ -4,10 +4,20 @@ using UnityEngine;
 
 namespace VirtualDemonstrator {
     public class VisualElement : MonoBehaviour {
-        private void Start() {
+        private void Start()
+        {
             // this.stateHistory = new List<VisualElementState>();
             // Add the initial state.
             // AddState();
+            this.workspace = GameObject.Find("Workspace").GetComponent<Workspace>();
+        } 
+        
+        public void UpdateState()
+        {
+            VisualElementState state = this.workspace.GetCurrentState().elementStates[this];
+            state.SetStatePosition(this.gameObject.transform.position);
+            state.SetStateScale(this.gameObject.transform.localScale);
+            state.SetStateRotation(this.gameObject.transform.rotation);
         }
 
 
@@ -18,5 +28,7 @@ namespace VirtualDemonstrator {
         // private GameObject elementObject_;
 
         // This list holds all the states that the element has gone through.
+
+        public Workspace workspace;
     }
 }

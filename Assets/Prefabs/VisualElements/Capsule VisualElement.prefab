@@ -147,7 +147,18 @@ MonoBehaviour:
       m_Calls: []
   m_OnSelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: -3022691348866939412}
+        m_MethodName: UpdateState
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSelectCanceled:
     m_PersistentCalls:
       m_Calls: []
@@ -202,3 +213,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82b0f6714d6ff945afd07c9333e2a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  workspace: {fileID: 0}

@@ -26,6 +26,7 @@ namespace VirtualDemonstrator
         private WorkspaceState _prevState;
         private WorkspaceState _curState;
         private bool isLerping = false;
+        private float lerpT = 0;
 
         // Start is called before the first frame update
         private void Start()
@@ -43,7 +44,18 @@ namespace VirtualDemonstrator
         // Update is called once per frame
         private void Update()
         {
-        
+            if (this.isLerping)
+            {
+                this.lerpT += 0.01f;
+                if (this.lerpT > 1)
+                {
+                    this.isLerping = false;
+                }
+                else if (this._curState != null)
+                {
+                    this.updateCurrentState();
+                }
+            }
         }
 
         public void OnTimelineChanged(int index)
@@ -53,9 +65,8 @@ namespace VirtualDemonstrator
                 this._prevState = this._curState;
                 this.stateIndex = index;
                 _curState = GetStateAtTime(index);
-                if (this._curState != null) {
-                    this.updateCurrentState();
-                }
+                this.isLerping = true;
+                this.lerpT = 0;
             }
         }
 
@@ -125,7 +136,7 @@ namespace VirtualDemonstrator
 
         public void updateCurrentState() {
             // set the transforms
-            this._curState.updateAllStates(this._prevState, 1);
+            this._curState.updateAllStates(this._prevState, this.lerpT);
         }
 
         public void toggleMode(InteractionModes mode) {

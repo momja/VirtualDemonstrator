@@ -55,6 +55,10 @@ namespace VirtualDemonstrator {
         public Vector3 GetStateScale() { return stateScale_; }
         public Quaternion GetStateRotation() { return stateRotation_; }
 
+        public void SetStatePosition(Vector3 newPosition) { statePosition_ = newPosition; }
+        public void SetStateScale(Vector3 newScale) { stateScale_ = newScale; }
+        public void SetStateRotation(Quaternion newRotation) { stateRotation_ = newRotation; }
+
         // Each visual state keeps track of the correspending element's transform and material
         // at the time the state was instantiated.
         private VisualElement element_;
