@@ -59,6 +59,13 @@ namespace VirtualDemonstrator
             }
         }
 
+        public void InsertNewElement(VisualElement element) {
+            this._curState.AddState(element);
+            for (int i = 0; i > this.stateIndex; i++) {
+                this.stateHistory_[i].AddState(element);
+            }
+        }
+
         // This function
         public void InsertNewState(int index = -1)
         {

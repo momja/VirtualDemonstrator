@@ -12,7 +12,7 @@ namespace VirtualDemonstrator {
 
         public void AddElement(VisualElement element)
         {
-            workspace_.GetCurrentState().AddState(element);
+            workspace_.InsertNewElement(element);
         }
 
         public VisualElementInstantiator cubeMaker_;

@@ -21,7 +21,6 @@ namespace VirtualDemonstrator {
             this.stateScale_ = newState.GetStateScale();
             this.stateRotation_ = newState.GetStateRotation();
             this.stateColor_ = newState.GetStateColor();
-
         }
 
         // This function assigns a blend of this state with another.
