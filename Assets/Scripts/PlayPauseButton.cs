@@ -1,22 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 namespace VirtualDemonstrator {
     public class PlayPauseButton : MonoBehaviour
     {       
         public InteractionModes currentMode = InteractionModes.Create;
         public Timeline timeline;
-        public Texture playButtonSprite;
-        public Texture pauseButtonSprite;
+        public Sprite playButtonSprite;
+        public Sprite pauseButtonSprite;
 
         Image buttonImage;
 
         void Awake()
         {
-            // This doesn't work, and idk how to fix it
-            // buttonImage = GetComponent<Image>();
+            buttonImage = GetComponent<Image>();
         }
 
         public void OnButtonClick() 
@@ -38,14 +37,14 @@ namespace VirtualDemonstrator {
             this.currentMode = mode;
             timeline.toggleMode(mode);
 
-            // if (this.currentMode == InteractionModes.Create) 
-            // {
-            //     buttonImage.image = playButtonSprite;
-            // } 
-            // else if (this.currentMode == InteractionModes.Present) 
-            // {
-            //     buttonImage.image = pauseButtonSprite;
-            // }
+            if (this.currentMode == InteractionModes.Create) 
+            {
+                buttonImage.sprite = playButtonSprite;
+            } 
+            else if (this.currentMode == InteractionModes.Present) 
+            {
+                buttonImage.sprite = pauseButtonSprite;
+            }
         }
     }
 }
