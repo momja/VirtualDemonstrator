@@ -34,6 +34,8 @@ namespace VirtualDemonstrator {
             else {
                 elementStates[element] = newState;
             }
+
+            Debug.Log("Element count: " + elementStates.Count);
         }
 
         public Dictionary<VisualElement, VisualElementState> elementStates;
