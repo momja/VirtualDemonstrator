@@ -16,7 +16,6 @@ namespace VirtualDemonstrator {
 
         public void OnPointerDown(PointerEventData eventData) {
             Debug.Log("Pointer Down on Timeline");
-            timelineDelegate.pointerUp();
         }
 
         public void OnPointerUp(PointerEventData eventData)

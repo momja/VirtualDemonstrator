@@ -47,13 +47,14 @@ namespace VirtualDemonstrator
             if (this.isLerping)
             {
                 this.lerpT += 0.01f;
+                float t = Easings.easeInOut(this.lerpT);
                 if (this.lerpT > 1)
                 {
                     this.isLerping = false;
                 }
                 else if (this._curState != null)
                 {
-                    this.updateCurrentState();
+                    this.updateCurrentState(t);
                 }
             }
         }
@@ -134,9 +135,9 @@ namespace VirtualDemonstrator
             return this.stateHistory_[stateIndex];
         }
 
-        public void updateCurrentState() {
+        public void updateCurrentState(float t) {
             // set the transforms
-            this._curState.updateAllStates(this._prevState, this.lerpT);
+            this._curState.updateAllStates(this._prevState, t);
         }
 
         public void toggleMode(InteractionModes mode) {
@@ -147,6 +148,11 @@ namespace VirtualDemonstrator
         public WorkspaceState GetCurrentState()
         {
             return this._curState;
+        }
+
+        public List<WorkspaceState> GetStatesAfterCurrent() {
+            int cnt = this.stateHistory_.Count - this.stateIndex;
+            return this.stateHistory_.GetRange(this.stateIndex, cnt);
         }
     }
 }
