@@ -9,6 +9,7 @@ namespace VirtualDemonstrator {
         }
 
         public WorkspaceState(WorkspaceState prevState) {
+            this.elementStates = new Dictionary<VisualElement, VisualElementState>();
             foreach(VisualElement element in prevState.elementStates.Keys) {
                 VisualElementState elementState = prevState.elementStates[element];
                 VisualElementState newElementState = new VisualElementState(elementState);

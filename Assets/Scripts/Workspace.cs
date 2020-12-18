@@ -20,7 +20,7 @@ namespace VirtualDemonstrator
         public MenuPanel menuPanel;
         public Timeline timeline;
         private List<WorkspaceState> stateHistory_;
-        private List<GameObject> visualElements_;
+        private List<VisualElement> visualElements_;
         private float prevSliderValue;
         private int stateIndex;
         private WorkspaceState _prevState;
@@ -32,10 +32,11 @@ namespace VirtualDemonstrator
         {
             this.stateHistory_ = new List<WorkspaceState>();
             // this.visualElements_ = new List<VisualElement>();
-            this.visualElements_ = new List<GameObject>();
+            this.visualElements_ = new List<VisualElement>();
             this.timeline.workspace = this;
             // this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
             // this.timelineSlider.OnPointerUp.AddListener(delegate { OnSliderChanged(); });
+            InsertNewState();
         }
 
         // Update is called once per frame
@@ -44,12 +45,11 @@ namespace VirtualDemonstrator
         
         }
 
-        public void OnTimelineChanged(float t)
+        public void OnTimelineChanged(int index)
         {
             if (!isLerping) {
-                Debug.Log(t);
+                Debug.Log(index);
                 this._prevState = this._curState;
-                int index = Mathf.RoundToInt(t * this.stateHistory_.Count);
                 this.stateIndex = index;
                 _curState = GetStateAtTime(index);
                 if (this._curState != null) {
@@ -62,9 +62,18 @@ namespace VirtualDemonstrator
         public void InsertNewState(int index = -1)
         {
             // Create the new state based on the current workspace conditions.
-            WorkspaceState state = new WorkspaceState(this._curState);
+            WorkspaceState state;
+            if (this._curState == null) {
+                state = new WorkspaceState();
+            }
+            else {
+                state = new WorkspaceState(this._curState);
+            }
             this._prevState = this._curState;
             this._curState = state;
+            
+            // increment slider size
+            timeline.setStateCount(this.stateHistory_.Count);
 
             if (index < 0)
             {
@@ -75,7 +84,7 @@ namespace VirtualDemonstrator
             {
                 this.stateHistory_.Insert(index, state);
             }
-            this.timeline.stateCount += 1;
+            print("Total States: " + this.stateHistory_.Count);
         }
 
         public bool DeleteState(WorkspaceState state)

@@ -8,7 +8,6 @@ namespace VirtualDemonstrator {
         
         // public toggleModeButton toggleButton;
         public Workspace workspace;
-        public const float maxTime = 1;
         public float curTime;
         public int stateCount;
         public TimelineSlider slider;
@@ -17,6 +16,7 @@ namespace VirtualDemonstrator {
             this.curTime = 0;
             this.stateCount = 0;
             this.slider.timelineDelegate = this;
+            this.slider.slider.maxValue = this.stateCount;
         }
 
         private void Update() {
@@ -24,15 +24,22 @@ namespace VirtualDemonstrator {
         }
 
         public void pointerUp() {
-            this.workspace.OnTimelineChanged(slider.GetComponent<Slider>().value);
-        }
-
-        public int getTimeIndex(float time) {
-            return Mathf.RoundToInt(time * this.stateCount);
+            this.workspace.OnTimelineChanged((int)slider.slider.value);
         }
 
         public void toggleMode(InteractionModes mode) {
             this.workspace.toggleMode(mode);
+        }
+
+        public void addStateToWorkspace() {
+            print("Adding New State");
+            int t = (int)slider.slider.value;
+            workspace.InsertNewState(t);
+        }
+
+        public void setStateCount(int count) {
+            this.stateCount = count;
+            this.slider.slider.maxValue = this.stateCount;
         }
     }
 }
