@@ -3429,9 +3429,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
         type: 3}
+      propertyPath: m_OnSelectExited.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
       propertyPath: m_InteractionManager
       value: 
       objectReference: {fileID: 1593054713}
+    - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_OnSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_OnSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5615605704093617802, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
         type: 3}
       propertyPath: m_Enabled
