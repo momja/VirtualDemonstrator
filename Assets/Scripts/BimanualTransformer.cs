@@ -101,7 +101,7 @@ namespace VirtualDemonstrator
         private TransformAction action = TransformAction.ROTATION;
 
         // This value is true when the left controller loses connection.
-        private bool reconnecting = false;
+        private bool reconnecting = true;
 
         bool primaryButtonPressed = false;
         bool primaryButtonPrev = false;
