@@ -20,6 +20,16 @@ namespace VirtualDemonstrator {
             state.SetStateRotation(this.gameObject.transform.rotation);
         }
 
+        public void highlightObject() {
+            gameObject.GetComponent<Outline>().enabled = true;
+        }
+
+        public void unhighlightObject() {
+            // if (workspace.selectedElement != this) {
+                gameObject.GetComponent<Outline>().enabled = false;
+            // }
+        }
+
 
         // This function returns the Element's GameObject.
         public GameObject GetElementObject() { return this.gameObject; }

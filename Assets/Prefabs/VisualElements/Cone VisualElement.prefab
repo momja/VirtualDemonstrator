@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5340899575903288090}
   - component: {fileID: 6791967108187258914}
   - component: {fileID: 4252725573039920671}
+  - component: {fileID: 8516500771115031298}
   m_Layer: 9
   m_Name: Cone VisualElement
   m_TagString: Untagged
@@ -74,10 +75,32 @@ MonoBehaviour:
       m_Calls: []
   m_OnHoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4252725573039920671}
+        m_MethodName: highlightObject
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnHoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4252725573039920671}
+        m_MethodName: unhighlightObject
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnLastHoverExited:
     m_PersistentCalls:
       m_Calls: []
@@ -87,7 +110,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4252725573039920671}
+      - m_Target: {fileID: -4073236949252725841, guid: f56a30f46cb282f48bd39cd9769a7e71,
+          type: 3}
         m_MethodName: UpdateState
         m_Mode: 1
         m_Arguments:
@@ -111,15 +135,15 @@ MonoBehaviour:
   m_AttachTransform: {fileID: 0}
   m_AttachEaseInTime: 0.15
   m_MovementType: 1
-  m_TrackPosition: 1
+  m_TrackPosition: 0
   m_SmoothPosition: 0
   m_SmoothPositionAmount: 5
   m_TightenPosition: 0.5
-  m_TrackRotation: 1
+  m_TrackRotation: 0
   m_SmoothRotation: 0
   m_SmoothRotationAmount: 5
   m_TightenRotation: 0.5
-  m_ThrowOnDetach: 1
+  m_ThrowOnDetach: 0
   m_ThrowSmoothingDuration: 0.25
   m_ThrowSmoothingCurve:
     serializedVersion: 2
@@ -213,3 +237,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   workspace: {fileID: 0}
+--- !u!114 &8516500771115031298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6258578530245444547}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 0.10902455, g: 0.9245283, b: 0.27195153, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
