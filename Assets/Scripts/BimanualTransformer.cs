@@ -30,8 +30,8 @@ namespace VirtualDemonstrator
             }
 
             // Get updated input from the "x" button on the Quest controller.
-            xButtonPrev = primaryButtonPressed;
-            recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonPressed);
+            xButtonPrev = xButtonPressed;
+            recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out xButtonPressed);
 
             // If the "x" button was just pressed, cycle to the next interaction method.
             if (xButtonPressed && !xButtonPrev)
