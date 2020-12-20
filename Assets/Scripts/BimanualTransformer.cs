@@ -11,8 +11,8 @@ namespace VirtualDemonstrator
     // This enum helps determine which action is currently being done to an object.
     enum TransformAction
     {
-        ROTATION = 1,
-        SCALING = 2
+        ROTATION = 0,
+        SCALING = 1
     }
 
     // This class handles the users actions while an object is selected by the right hand.
