@@ -11,8 +11,9 @@ namespace VirtualDemonstrator
     // This enum helps determine which action is currently being done to an object.
     enum TransformAction
     {
-        ROTATION = 0,
-        SCALING = 1
+        TRANSLATION = 0,
+        ROTATION = 1,
+        SCALING = 2
     }
 
     // This class handles the users actions while an object is selected by the right hand.
@@ -29,19 +30,23 @@ namespace VirtualDemonstrator
             }
 
             // Get updated input from the "x" button on the Quest controller.
-            primaryButtonPrev = primaryButtonPressed;
+            xButtonPrev = primaryButtonPressed;
             recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonPressed);
 
             // If the "x" button was just pressed, cycle to the next interaction method.
-            if (primaryButtonPressed && !primaryButtonPrev)
+            if (xButtonPressed && !xButtonPrev)
             {
-                action = (TransformAction)(((int)action + 1) % 2);
+                action = (TransformAction)(((int)action + 1) % 3);
             }
 
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
             if (selecting)
             {
-                if (action == TransformAction.ROTATION)
+                if (action == TransformAction.TRANSLATION)
+                {
+
+                }
+                else if (action == TransformAction.ROTATION)
                 {
                     // While holding the object with your right hand, it can mirror your left hand's rotation.
                     selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
@@ -74,6 +79,21 @@ namespace VirtualDemonstrator
                 reconnecting = false;
                 recessiveController = leftHandedControllers[0];
             }
+
+            List<InputDevice> rightHandedControllers = new List<InputDevice>();
+            var rightCharacteristics = InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller | InputDeviceCharacteristics.Right;
+            InputDevices.GetDevicesWithCharacteristics(rightCharacteristics, rightHandedControllers);
+
+            if (rightHandedControllers.Count == 0)
+            {
+                Debug.Log("Attempting to connect to the right controller...");
+                reconnecting = true;
+            }
+            else
+            {
+                reconnecting = false;
+                dominantController = rightHandedControllers[0];
+            }
         }
 
 
@@ -86,13 +106,17 @@ namespace VirtualDemonstrator
 
 
         // This method gets called whenever the dominant controller releases an object.
-        public void ElementReleased() { selecting = false; }
+        public void ElementReleased() 
+        {
+            selecting = false; 
+        }
 
 
         // These objects help with getting transform data.
         public GameObject dominantControllerObject;
         public GameObject recessiveControllerObject;
         public XRRayInteractor dominantInteractor;
+        private InputDevice dominantController;
         private InputDevice recessiveController;
 
         // These values help with the transformation actions.
@@ -103,7 +127,7 @@ namespace VirtualDemonstrator
         // This value is true when the left controller loses connection.
         private bool reconnecting = true;
 
-        bool primaryButtonPressed = false;
-        bool primaryButtonPrev = false;
+        bool xButtonPressed = false;
+        bool xButtonPrev = false;
     }
 }
