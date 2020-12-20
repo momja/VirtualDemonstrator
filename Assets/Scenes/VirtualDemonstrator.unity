@@ -672,6 +672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuPanel: {fileID: 5615605704911986024}
   timeline: {fileID: 1853886323}
+  selectedElement: {fileID: 0}
 --- !u!4 &257098541
 Transform:
   m_ObjectHideFlags: 0
@@ -1251,6 +1252,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5167779663779864359, guid: f5cb16aec7253db4591ea8e966d42941,
+        type: 3}
+      propertyPath: m_ClearFlags
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5167779664242428040, guid: f5cb16aec7253db4591ea8e966d42941,
         type: 3}
@@ -2329,7 +2335,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_SelectActionTrigger: 0
+  m_SelectActionTrigger: 2
   m_HideControllerOnSelect: 0
   m_PlayAudioClipOnSelectEntered: 0
   m_AudioClipForOnSelectEntered: {fileID: 0}
@@ -2589,7 +2595,7 @@ MonoBehaviour:
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 3
   m_VolumeTrigger: {fileID: 0}
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
@@ -3466,14 +3472,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
         type: 3}
-      propertyPath: m_InteractionManager
-      value: 
-      objectReference: {fileID: 1593054713}
-    - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
-        type: 3}
       propertyPath: m_OnSelectExited.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_InteractionManager
+      value: 
+      objectReference: {fileID: 1593054713}
     - target: {fileID: 5615605704093617793, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
         type: 3}
       propertyPath: m_OnSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -3706,6 +3712,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8626353890309964498, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8626353890309964498, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
+        type: 3}
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 431180814}
@@ -3722,11 +3733,6 @@ PrefabInstance:
     - target: {fileID: 8626353890309964498, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
         type: 3}
       propertyPath: m_Colors.m_NormalColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8626353890309964498, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8626353890309964498, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
@@ -3921,6 +3927,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8626353891614778289, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
         type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8626353891614778289, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
+        type: 3}
       propertyPath: m_Value
       value: 0
       objectReference: {fileID: 0}
@@ -3933,11 +3944,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_WholeNumbers
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8626353891614778289, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
-        type: 3}
-      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8626353891614778289, guid: c3c6a73ab897d4b4f84676d1cf200ff6,
         type: 3}

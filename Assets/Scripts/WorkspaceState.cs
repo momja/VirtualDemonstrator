@@ -50,12 +50,14 @@ namespace VirtualDemonstrator {
                     prevElementState.BlendStates(curElementState, t);
                 }
                 else {
-                    
+                    // Pop in from zero scale
+
                 }
             }
             foreach(VisualElement element in prevState.elementStates.Keys) {
                 if (!this.ElementExists(element)) {
                     // Disable
+                    
                 }
             }
         }
