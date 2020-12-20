@@ -35,7 +35,7 @@ namespace VirtualDemonstrator
             // If the "x" button was just pressed, cycle to the next interaction method.
             if (primaryButtonPressed && !primaryButtonPrev)
             {
-                action = (TransformAction)((int)(action + 1) % 2);
+                action = (TransformAction)(((int)action + 1) % 2);
             }
 
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
