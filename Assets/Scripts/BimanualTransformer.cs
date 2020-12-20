@@ -62,7 +62,7 @@ namespace VirtualDemonstrator
         }
 
 
-        // This function attempts to connect the recessive controller if it disconnects.
+        // This function attempts to connect the controllers if it disconnects.
         private void ConnectController()
         {
             List<InputDevice> leftHandedControllers = new List<InputDevice>();
