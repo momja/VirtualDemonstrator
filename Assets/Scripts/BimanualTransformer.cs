@@ -50,6 +50,7 @@ namespace VirtualDemonstrator
                 {
                     // While holding the object with your right hand, it can mirror your left hand's rotation.
                     selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
+                    selectedElement.transform.localRotation *= rotationDifference;
                 }
                 else if (action == TransformAction.SCALING)
                 {
@@ -102,6 +103,7 @@ namespace VirtualDemonstrator
         {
             selecting = true;
             selectedElement = dominantInteractor.selectTarget.gameObject;
+            rotationDifference = recessiveControllerObject.transform.localRotation * Quaternion.Inverse(selectedElement.transform.localRotation);
         }
 
 
@@ -122,6 +124,7 @@ namespace VirtualDemonstrator
         // These values help with the transformation actions.
         private bool selecting = false;
         private GameObject selectedElement = null;
+        private Quaternion rotationDifference;
         private TransformAction action = TransformAction.ROTATION;
 
         // This value is true when the left controller loses connection.
