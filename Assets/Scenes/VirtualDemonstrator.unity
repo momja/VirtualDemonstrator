@@ -2410,8 +2410,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d98b90401716d4bb6d0d0f7530b490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dominantController: {fileID: 1808793076}
-  recessiveController: {fileID: 1235469434}
+  dominantControllerObject: {fileID: 0}
+  recessiveControllerObject: {fileID: 0}
   dominantInteractor: {fileID: 66774132}
 --- !u!1 &1362881536 stripped
 GameObject:
@@ -2651,9 +2651,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d98b90401716d4bb6d0d0f7530b490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dominantController: {fileID: 0}
-  recessiveController: {fileID: 0}
-  dominantInteractor: {fileID: 0}
+  dominantControllerObject: {fileID: 1808793076}
+  recessiveControllerObject: {fileID: 1235469434}
+  dominantInteractor: {fileID: 1339806179}
 --- !u!114 &1808793080
 MonoBehaviour:
   m_ObjectHideFlags: 0
