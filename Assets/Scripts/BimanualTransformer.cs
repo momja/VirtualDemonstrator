@@ -36,6 +36,8 @@ namespace VirtualDemonstrator
             bool prevIdle = !prevRecessiveGripDown && !prevDominantGripDown;
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
+            bool xPressed = false;
+            recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out xPressed);
 
             // If the "x" button was just pressed, cycle to the next interaction method.
             if (recessiveGripDown && dominantGripDown && (!prevDominantGripDown || !prevRecessiveGripDown)) {
@@ -90,11 +92,19 @@ namespace VirtualDemonstrator
                         selectedElement.transform.SetParent(prevParent);
                         prevParent = null;
                     }
-                    // float xFactor = scalingElement.x + scalingController.x - (dominantControllerObject.transform.position.x - recessiveControllerObject.transform.position.x);
-                    // float yFactor = Math.Abs(dominantControllerObject.transform.position.y - recessiveControllerObject.transform.position.y);
-                    // float zFactor = Math.Abs(dominantControllerObject.transform.position.z - recessiveControllerObject.transform.position.z);
-                    selectedElement.transform.localScale = scalingElement + (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
-                    // selectedElement.transform.localScale = new Vector3(xFactor, yFactor, zFactor);
+                    if (xPressed) {
+                        Vector3 scaling = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
+                        if (scaling.x > scaling.y && scaling.x > scaling.z) {
+                            selectedElement.transform.localScale = scalingElement + new Vector3(scaling.x,0,0);
+                        } else if (scaling.y > scaling.x && scaling.y > scaling.z) {
+                            selectedElement.transform.localScale = scalingElement + new Vector3(0,scaling.y,0);
+                        } else if (scaling.z > scaling.y && scaling.z > scaling.x) {
+                            selectedElement.transform.localScale = scalingElement + new Vector3(0,0,scaling.z);
+                        }
+                    }
+                    else {
+                        selectedElement.transform.localScale = scalingElement + (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
+                    }
                 }
                 else if (action == TransformAction.IDLE) {
                     if (selectedElement.transform.parent != null) {
@@ -144,9 +154,13 @@ namespace VirtualDemonstrator
         // This method gets called whenever the dominant controller selects an object.
         public void ElementSelected()
         {
-            selecting = true;
             selectedElement = dominantInteractor.selectTarget.gameObject;
             selectedVisualElement = selectedElement.GetComponent<VisualElement>();
+            if (selectedVisualElement != null) {
+                selecting = true;
+            } else {
+                selectedElement = null;
+            }
             // rotationDifference = selectedElement.transform.localRotation * Quaternion.Inverse(recessiveControllerObject.transform.localRotation);
         }
 
