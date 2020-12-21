@@ -49,15 +49,18 @@ namespace VirtualDemonstrator
                 else if (action == TransformAction.ROTATION)
                 {
                     // While holding the object with your right hand, it can mirror your left hand's rotation.
-                    selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
-                    selectedElement.transform.localRotation *= rotationDifference;
+                    // selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
+                    // selectedElement.transform.localRotation = rotationDifference * selectedElement.transform.localRotation;
+                    Quaternion controllerDiff = recessiveControllerObject.transform.localRotation * Quaternion.Inverse(rotationController);
+                    selectedElement.transform.localRotation = controllerDiff * rotationElement;
                 }
                 else if (action == TransformAction.SCALING)
                 {
-                    float xFactor = Math.Abs(dominantControllerObject.transform.position.x - recessiveControllerObject.transform.position.x);
-                    float yFactor = Math.Abs(dominantControllerObject.transform.position.y - recessiveControllerObject.transform.position.y);
-                    float zFactor = Math.Abs(dominantControllerObject.transform.position.z - recessiveControllerObject.transform.position.z);
-                    selectedElement.transform.localScale = new Vector3(xFactor, yFactor, zFactor);
+                    // float xFactor = scalingElement.x + scalingController.x - (dominantControllerObject.transform.position.x - recessiveControllerObject.transform.position.x);
+                    // float yFactor = Math.Abs(dominantControllerObject.transform.position.y - recessiveControllerObject.transform.position.y);
+                    // float zFactor = Math.Abs(dominantControllerObject.transform.position.z - recessiveControllerObject.transform.position.z);
+                    selectedElement.transform.localScale = scalingElement + (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
+                    // selectedElement.transform.localScale = new Vector3(xFactor, yFactor, zFactor);
                 }
             }
         }
@@ -103,7 +106,11 @@ namespace VirtualDemonstrator
         {
             selecting = true;
             selectedElement = dominantInteractor.selectTarget.gameObject;
-            rotationDifference = recessiveControllerObject.transform.localRotation * Quaternion.Inverse(selectedElement.transform.localRotation);
+            rotationController = recessiveControllerObject.transform.localRotation;
+            rotationElement = selectedElement.transform.localRotation;
+            scalingController = dominantControllerObject.transform.position - recessiveControllerObject.transform.position;
+            scalingElement = selectedElement.transform.localScale;
+            // rotationDifference = selectedElement.transform.localRotation * Quaternion.Inverse(recessiveControllerObject.transform.localRotation);
         }
 
 
@@ -124,7 +131,10 @@ namespace VirtualDemonstrator
         // These values help with the transformation actions.
         private bool selecting = false;
         private GameObject selectedElement = null;
-        private Quaternion rotationDifference;
+        private Vector3 scalingController;
+        private Vector3 scalingElement;
+        private Quaternion rotationController;
+        private Quaternion rotationElement;
         private TransformAction action = TransformAction.ROTATION;
 
         // This value is true when the left controller loses connection.
