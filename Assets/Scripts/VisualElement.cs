@@ -10,6 +10,8 @@ namespace VirtualDemonstrator {
         private Outline outline;
         private bool selected = false;
 
+        private bool firstTransform = false;
+
         private void Start()
         {
             // this.stateHistory = new List<VisualElementState>();

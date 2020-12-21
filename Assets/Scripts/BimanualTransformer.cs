@@ -33,6 +33,7 @@ namespace VirtualDemonstrator
             // Get updated input from the "x" button on the Quest controller.
             bool prevRecessiveGripDown = recessiveGripDown;
             bool prevDominantGripDown = dominantGripDown;
+            bool prevIdle = !prevRecessiveGripDown && !prevDominantGripDown;
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
 
@@ -54,8 +55,9 @@ namespace VirtualDemonstrator
                 // Translation
                 action = TransformAction.TRANSLATION;
             }
-            else if (!recessiveGripDown && !dominantGripDown) {
+            else if (prevIdle) {
                 // None
+                selectedVisualElement.UpdateState();
                 action = TransformAction.IDLE;
             }
 
@@ -144,6 +146,7 @@ namespace VirtualDemonstrator
         {
             selecting = true;
             selectedElement = dominantInteractor.selectTarget.gameObject;
+            selectedVisualElement = selectedElement.GetComponent<VisualElement>();
             // rotationDifference = selectedElement.transform.localRotation * Quaternion.Inverse(recessiveControllerObject.transform.localRotation);
         }
 
@@ -169,6 +172,7 @@ namespace VirtualDemonstrator
         // These values help with the transformation actions.
         private bool selecting = false;
         private GameObject selectedElement = null;
+        private VisualElement selectedVisualElement = null;
         private Vector3 scalingController;
         private Vector3 scalingElement;
         private Quaternion rotationController;
