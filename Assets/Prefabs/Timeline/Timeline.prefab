@@ -555,6 +555,7 @@ GameObject:
   - component: {fileID: 8626353890309964497}
   - component: {fileID: 8626353890309964498}
   - component: {fileID: 431180816}
+  - component: {fileID: 3176956775100907408}
   m_Layer: 5
   m_Name: Play-Pause Button
   m_TagString: Untagged
@@ -662,7 +663,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 431180816}
+      - m_Target: {fileID: 3176956775100907408}
         m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
@@ -674,6 +675,22 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &431180816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8626353890309964500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d014a28a6467644a98aa10e104a73bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentMode: 0
+  timeline: {fileID: 1853886323}
+  playButtonSprite: {fileID: 21300000, guid: 2ff0ede8db90f56498cd47deacd4b75a, type: 3}
+  pauseButtonSprite: {fileID: 21300000, guid: a8bad5092dd4e0442ba9931bc33d1872, type: 3}
+--- !u!114 &3176956775100907408
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1067,6 +1084,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2073575828}
+        m_MethodName: UpdateMarkers
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8626353891614778291
 GameObject:
   m_ObjectHideFlags: 0
@@ -1151,7 +1179,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 8626353891043192902}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 5
+  m_MaxValue: 0
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
@@ -1246,12 +1274,12 @@ PrefabInstance:
     - target: {fileID: 6139907344532586826, guid: 34effd6749c9e5943ac4006c4aa1c5a2,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 15
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6139907344532586826, guid: 34effd6749c9e5943ac4006c4aa1c5a2,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 15
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6139907344532586826, guid: 34effd6749c9e5943ac4006c4aa1c5a2,
         type: 3}
