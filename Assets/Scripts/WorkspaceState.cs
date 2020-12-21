@@ -50,12 +50,19 @@ namespace VirtualDemonstrator {
                     prevElementState.BlendStates(curElementState, t);
                 }
                 else {
-                    
+                    // Pop in from zero scale
+                    VisualElementState pseudoState = new VisualElementState(curElementState);
+                    pseudoState.SetStateScale(Vector3.zero);
+                    pseudoState.BlendStates(curElementState, t);
                 }
             }
             foreach(VisualElement element in prevState.elementStates.Keys) {
                 if (!this.ElementExists(element)) {
                     // Disable
+                    VisualElementState prevElementState = prevState.elementStates[element];
+                    VisualElementState pseudoState = new VisualElementState(prevElementState);
+                    pseudoState.SetStateScale(Vector3.zero);
+                    prevElementState.BlendStates(pseudoState, t);
                 }
             }
         }

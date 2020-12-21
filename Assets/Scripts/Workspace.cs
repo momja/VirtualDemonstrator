@@ -19,8 +19,10 @@ namespace VirtualDemonstrator
     {
         public MenuPanel menuPanel;
         public Timeline timeline;
+        public VisualElement selectedElement;
         private List<WorkspaceState> stateHistory_;
         private List<VisualElement> visualElements_;
+
         private float prevSliderValue;
         private int stateIndex;
         private WorkspaceState _prevState;
