@@ -13,7 +13,8 @@ namespace VirtualDemonstrator
     {
         TRANSLATION = 0,
         ROTATION = 1,
-        SCALING = 2
+        SCALING = 2,
+        IDLE = 3
     }
 
     // This class handles the users actions while an object is selected by the right hand.
@@ -30,13 +31,32 @@ namespace VirtualDemonstrator
             }
 
             // Get updated input from the "x" button on the Quest controller.
-            xButtonPrev = xButtonPressed;
-            recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out xButtonPressed);
+            bool prevRecessiveGripDown = recessiveGripDown;
+            bool prevDominantGripDown = dominantGripDown;
+            recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
+            dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
 
             // If the "x" button was just pressed, cycle to the next interaction method.
-            if (xButtonPressed && !xButtonPrev)
+            if (recessiveGripDown && dominantGripDown && (!prevDominantGripDown || !prevRecessiveGripDown)) {
+                // Scaling
+                scalingController = dominantControllerObject.transform.position - recessiveControllerObject.transform.position;
+                scalingElement = selectedElement.transform.localScale;
+                action = TransformAction.SCALING;
+            }
+            else if (recessiveGripDown && !prevRecessiveGripDown)
             {
-                action = (TransformAction)(((int)action + 1) % 3);
+                // Rotation
+                rotationController = recessiveControllerObject.transform.localRotation;
+                rotationElement = selectedElement.transform.localRotation;
+                action = TransformAction.ROTATION;
+            }
+            else if (dominantGripDown && !prevDominantGripDown) {
+                // Translation
+                action = TransformAction.TRANSLATION;
+            }
+            else if (!recessiveGripDown && !dominantGripDown) {
+                // None
+                action = TransformAction.IDLE;
             }
 
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
@@ -44,10 +64,18 @@ namespace VirtualDemonstrator
             {
                 if (action == TransformAction.TRANSLATION)
                 {
-
+                    // Set selected object as child as of dominant controller
+                    if (prevParent == null) {
+                        prevParent = selectedElement.transform.parent;
+                        selectedElement.transform.SetParent(dominantControllerObject.transform);
+                    }
                 }
                 else if (action == TransformAction.ROTATION)
                 {
+                    if (selectedElement.transform.parent != null) {
+                        selectedElement.transform.SetParent(prevParent);
+                        prevParent = null;
+                    }
                     // While holding the object with your right hand, it can mirror your left hand's rotation.
                     // selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
                     // selectedElement.transform.localRotation = rotationDifference * selectedElement.transform.localRotation;
@@ -56,11 +84,21 @@ namespace VirtualDemonstrator
                 }
                 else if (action == TransformAction.SCALING)
                 {
+                    if (selectedElement.transform.parent != null) {
+                        selectedElement.transform.SetParent(prevParent);
+                        prevParent = null;
+                    }
                     // float xFactor = scalingElement.x + scalingController.x - (dominantControllerObject.transform.position.x - recessiveControllerObject.transform.position.x);
                     // float yFactor = Math.Abs(dominantControllerObject.transform.position.y - recessiveControllerObject.transform.position.y);
                     // float zFactor = Math.Abs(dominantControllerObject.transform.position.z - recessiveControllerObject.transform.position.z);
                     selectedElement.transform.localScale = scalingElement + (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
                     // selectedElement.transform.localScale = new Vector3(xFactor, yFactor, zFactor);
+                }
+                else if (action == TransformAction.IDLE) {
+                    if (selectedElement.transform.parent != null) {
+                        selectedElement.transform.SetParent(prevParent);
+                        prevParent = null;
+                    }
                 }
             }
         }
@@ -106,10 +144,6 @@ namespace VirtualDemonstrator
         {
             selecting = true;
             selectedElement = dominantInteractor.selectTarget.gameObject;
-            rotationController = recessiveControllerObject.transform.localRotation;
-            rotationElement = selectedElement.transform.localRotation;
-            scalingController = dominantControllerObject.transform.position - recessiveControllerObject.transform.position;
-            scalingElement = selectedElement.transform.localScale;
             // rotationDifference = selectedElement.transform.localRotation * Quaternion.Inverse(recessiveControllerObject.transform.localRotation);
         }
 
@@ -117,7 +151,11 @@ namespace VirtualDemonstrator
         // This method gets called whenever the dominant controller releases an object.
         public void ElementReleased() 
         {
-            selecting = false; 
+            selecting = false;
+            if (selectedElement.transform.parent != null) {
+                selectedElement.transform.SetParent(prevParent);
+                prevParent = null;
+            }
         }
 
 
@@ -135,12 +173,14 @@ namespace VirtualDemonstrator
         private Vector3 scalingElement;
         private Quaternion rotationController;
         private Quaternion rotationElement;
-        private TransformAction action = TransformAction.ROTATION;
+        private TransformAction action = TransformAction.IDLE;
+        private Transform prevParent;
+        private bool dominantGripDown = false;
 
         // This value is true when the left controller loses connection.
         private bool reconnecting = true;
 
-        bool xButtonPressed = false;
+        bool recessiveGripDown = false;
         bool xButtonPrev = false;
     }
 }
