@@ -22,6 +22,7 @@ namespace VirtualDemonstrator
 
         void Start() {
             this.rig = FindObjectOfType<XRRig>();
+            this.xrInteractionManager = FindObjectOfType<XRInteractionManager>();
         }
 
         // Update is called once per frame
@@ -40,28 +41,24 @@ namespace VirtualDemonstrator
             // Get updated input from the "x" button on the Quest controller.
             bool prevRecessiveGripDown = recessiveGripDown;
             bool prevDominantGripDown = dominantGripDown;
-            bool prevIdle = !prevRecessiveGripDown && !prevDominantGripDown;
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
-            bool xPressed = false;
-            recessiveController.TryGetFeatureValue(CommonUsages.primaryButton, out xPressed);
+            bool idle = (prevRecessiveGripDown || prevDominantGripDown) && (!recessiveGripDown && !dominantGripDown);
+
+            Workspace.Instance.selectionParent.SetParent(null);
 
             if (recessiveGripDown && dominantGripDown && (!prevDominantGripDown || !prevRecessiveGripDown))
             {
                 // Scaling (absolute)
                 scalingController = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position);
-                // scalingController = new Vector3(Mathf.Abs(scalingController.x),
-                //                                 Math.Abs(scalingController.y),
-                //                                 Mathf.Abs(scalingController.z));
-
                 // instantiate mini scale object
-                miniObject = Instantiate(selectedElement.transform,
+                miniObject = Instantiate(Workspace.Instance.selectionParent.transform,
                                          ControllerMidpoint(),
                                          RotationAlongControllerAxis(),
                                          null);
-                miniObject.transform.localScale = 0.1f*selectedElement.transform.localScale;
+                miniObject.transform.localScale = 0.1f*Workspace.Instance.selectionParent.transform.localScale;
                 lineBtwnControllers.enabled = true;
-                scalingElement = selectedElement.transform.localScale;
+                scalingElement = Workspace.Instance.selectionParent.transform.localScale;
                 action = TransformAction.SCALING;
             }
             else if (recessiveGripDown && !prevRecessiveGripDown)
@@ -73,7 +70,7 @@ namespace VirtualDemonstrator
                     lineBtwnControllers.enabled = false;
                 }
                 rotationController = recessiveControllerObject.transform.localRotation;
-                rotationElement = selectedElement.transform.localRotation;
+                rotationElement = Workspace.Instance.selectionParent.localRotation;
                 action = TransformAction.ROTATION;
             }
             else if (dominantGripDown && !prevDominantGripDown)
@@ -86,18 +83,15 @@ namespace VirtualDemonstrator
                 }
                 action = TransformAction.TRANSLATION;
             }
-            else if (prevIdle)
+            else if (idle)
             {
-                // Idle on last update
-                if (selectedVisualElement != null)
-                {
-                    if (miniObject != null) {
-                        GameObject.Destroy(miniObject.gameObject, 0);
-                        miniObject = null;
-                        lineBtwnControllers.enabled = false;
-                    }
-                    selectedVisualElement.UpdateState();
+                // Idle
+                if (miniObject != null) {
+                    GameObject.Destroy(miniObject.gameObject, 0);
+                    miniObject = null;
+                    lineBtwnControllers.enabled = false;
                 }
+                Workspace.Instance.updateSelectedElementStates();
                 action = TransformAction.IDLE;
             }
 
@@ -106,73 +100,44 @@ namespace VirtualDemonstrator
             {
                 if (action == TransformAction.TRANSLATION)
                 {
-                    // Set selected object as child as of dominant controller
-                    if (prevParent == null)
-                    {
-                        prevParent = selectedElement.transform.parent;
-                        selectedElement.transform.SetParent(dominantControllerObject.transform);
-                    }
+                    // Set selected object as child of dominant controller
+                    Workspace.Instance.selectionParent.SetParent(dominantControllerObject.transform);
                 }
                 else if (action == TransformAction.ROTATION)
                 {
-                    if (selectedElement.transform.parent != null)
-                    {
-                        selectedElement.transform.SetParent(prevParent);
-                        prevParent = null;
-                    }
                     // While holding the object with your right hand, it can mirror your left hand's rotation.
-                    // selectedElement.transform.localRotation = recessiveControllerObject.transform.localRotation;
-                    // selectedElement.transform.localRotation = rotationDifference * selectedElement.transform.localRotation;
                     Quaternion controllerDiff = recessiveControllerObject.transform.localRotation * Quaternion.Inverse(rotationController);
-                    selectedElement.transform.localRotation = controllerDiff * rotationElement;
+                    Workspace.Instance.selectionParent.localRotation = controllerDiff * rotationElement;
                 }
                 else if (action == TransformAction.SCALING)
                 {
                     // Set miniobject position
                     miniObject.position = ctrlMidpoint;
                     miniObject.rotation = RotationAlongControllerAxis();
-                    miniObject.transform.localScale = 0.1f*selectedElement.transform.localScale;
+                    miniObject.transform.localScale = 0.1f*Workspace.Instance.selectionParent.localScale;
 
                     // Set positions of Line Renderer
                     lineBtwnControllers.SetPosition(0, recessiveControllerObject.transform.position);
                     lineBtwnControllers.SetPosition(1, ctrlMidpoint);
                     lineBtwnControllers.SetPosition(2, dominantControllerObject.transform.position);
 
-                    if (selectedElement.transform.parent != null)
+                    Vector3 curControllerDiff = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position);
+                    Vector3 scalingFactor = curControllerDiff - scalingController;
+                    scalingFactor = ClipVec(scalingFactor); // Prevent < 0 scales
+                    if (Workspace.Instance.selVisualElements.Count > 1)
                     {
-                        selectedElement.transform.SetParent(prevParent);
-                        prevParent = null;
-                    }
-                    if (xPressed)
-                    {
-                        Vector3 scaling = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position) - scalingController;
-                        if (scaling.x > scaling.y && scaling.x > scaling.z)
-                        {
-                            selectedElement.transform.localScale = scalingElement + new Vector3(scaling.x, 0, 0);
-                        }
-                        else if (scaling.y > scaling.x && scaling.y > scaling.z)
-                        {
-                            selectedElement.transform.localScale = scalingElement + new Vector3(0, scaling.y, 0);
-                        }
-                        else if (scaling.z > scaling.y && scaling.z > scaling.x)
-                        {
-                            selectedElement.transform.localScale = scalingElement + new Vector3(0, 0, scaling.z);
-                        }
+                        // Only allow uniform scaling when multiple objects are selected
+                        float maxScale = Mathf.Max(scalingFactor.x, scalingFactor.y, scalingFactor.z);
+                        Workspace.Instance.selectionParent.localScale = maxScale*Vector3.one + scalingElement;
                     }
                     else
                     {
-                        Vector3 curControllerDiff = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position);
-                        Vector3 scalingFactor = curControllerDiff - scalingController;
-                        selectedElement.transform.localScale = scalingElement + curControllerDiff - scalingController;
+                        Workspace.Instance.selectionParent.localScale = scalingElement + scalingFactor;
                     }
                 }
                 else if (action == TransformAction.IDLE)
                 {
-                    if (selectedElement.transform.parent != null)
-                    {
-                        selectedElement.transform.SetParent(prevParent);
-                        prevParent = null;
-                    }
+
                 }
             }
         }
@@ -212,6 +177,14 @@ namespace VirtualDemonstrator
             }
         }
 
+        private Vector3 ClipVec(Vector3 vec,
+                                float clipMinX = 0, float clipMaxX = Mathf.Infinity,
+                                float clipMinY = 0, float clipMaxY = Mathf.Infinity,
+                                float clipMinZ = 0, float clipMaxZ = Mathf.Infinity) {
+            return new Vector3(Mathf.Clamp(vec.x, clipMinX, clipMaxX),
+                               Mathf.Clamp(vec.y, clipMinY, clipMaxY),
+                               Mathf.Clamp(vec.z, clipMinZ, clipMaxZ));
+        }
 
         // Finds the world space point between the dominant and recessive controllers.
         private Vector3 ControllerMidpoint() {
@@ -231,36 +204,29 @@ namespace VirtualDemonstrator
         // This method gets called whenever the dominant controller selects an object.
         public void ElementSelected()
         {
-            selectedElement = dominantInteractor.selectTarget.gameObject;
-            selectedVisualElement = selectedElement.GetComponent<VisualElement>();
-            if (selectedVisualElement != null)
+            GameObject selectedElement = dominantInteractor.selectTarget.gameObject;
+            Workspace.Instance.selectionParent.SetParent(null);
+            VisualElement selVisElem = selectedElement.GetComponent<VisualElement>();
+            if (selVisElem == null)
             {
+                // remove all selection
+                Workspace.Instance.ClearSelectedElements();
+                selecting = false;
+            } else if (Workspace.Instance.selVisualElements.Contains(selVisElem)) {
+                // remove from list
+                Workspace.Instance.RemoveSelectedElement(selVisElem);
+            } else {
+                // add new element
+                Workspace.Instance.AddSelectedElement(selVisElem);
                 selecting = true;
             }
-            else
-            {
-                selectedElement = null;
-            }
-            // rotationDifference = selectedElement.transform.localRotation * Quaternion.Inverse(recessiveControllerObject.transform.localRotation);
         }
-
-
-        // This method gets called whenever the dominant controller releases an object.
-        public void ElementReleased()
-        {
-            selecting = false;
-            if (selectedElement.transform.parent != null)
-            {
-                selectedElement.transform.SetParent(prevParent);
-                prevParent = null;
-            }
-        }
-
 
         // These objects help with getting transform data.
         public GameObject dominantControllerObject;
         public GameObject recessiveControllerObject;
         public XRRayInteractor dominantInteractor;
+        public XRInteractionManager xrInteractionManager;
         public LineRenderer lineBtwnControllers;
 
         private InputDevice dominantController;
@@ -268,14 +234,11 @@ namespace VirtualDemonstrator
         private XRRig rig;
         // These values help with the transformation actions.
         private bool selecting = false;
-        private GameObject selectedElement = null;
-        private VisualElement selectedVisualElement = null;
         private Vector3 scalingController;
         private Vector3 scalingElement;
         private Quaternion rotationController;
         private Quaternion rotationElement;
         private TransformAction action = TransformAction.IDLE;
-        private Transform prevParent;
         private bool dominantGripDown = false;
         private Transform miniObject = null;
         private bool xButtonPrev = false;

@@ -6,8 +6,6 @@ namespace VirtualDemonstrator {
         private void Start()
         {
             cubeMaker_.menu_ = this;
-            coneMaker_.menu_ = this;
-            capsuleMaker_.menu_ = this; 
         }
 
         public void AddElement(VisualElement element)
@@ -16,8 +14,6 @@ namespace VirtualDemonstrator {
         }
 
         public VisualElementInstantiator cubeMaker_;
-        public VisualElementInstantiator coneMaker_;
-        public VisualElementInstantiator capsuleMaker_;
         public Workspace workspace_;
     }
 }

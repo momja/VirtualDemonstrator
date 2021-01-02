@@ -17,12 +17,21 @@ namespace VirtualDemonstrator
     /// </summary>
     public class Workspace : MonoBehaviour
     {
+
+        private static Workspace _instance;
+        public static Workspace Instance { get { return _instance; } }
+
         public MenuPanel menuPanel;
         public Timeline timeline;
-        public VisualElement selectedElement;
+        public HashSet<VisualElement> selVisualElements {
+            get {
+                return selectedVisualElements_;
+            }
+        }
+        public Transform selectionParent;
+        public Transform nonSelectionParent;
         private List<WorkspaceState> stateHistory_;
-        private List<VisualElement> visualElements_;
-
+        private HashSet<VisualElement> selectedVisualElements_;
         private float prevSliderValue;
         private int stateIndex;
         private WorkspaceState _prevState;
@@ -34,13 +43,22 @@ namespace VirtualDemonstrator
         private void Start()
         {
             this.stateHistory_ = new List<WorkspaceState>();
-            // this.visualElements_ = new List<VisualElement>();
-            this.visualElements_ = new List<VisualElement>();
+            this.selectedVisualElements_ = new HashSet<VisualElement>();
+            this.selectionParent = GameObject.Find("SelectionParent").transform;
+            this.nonSelectionParent = null;
             this.timeline.workspace = this;
             this.menuPanel.workspace_ = this;
             // this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
             // this.timelineSlider.OnPointerUp.AddListener(delegate { OnSliderChanged(); });
             InsertNewState();
+        }
+
+        private void Awake() {
+            if (_instance != null && _instance != this) {
+                Destroy(this.gameObject);
+            } else {
+                _instance = this;
+            }
         }
 
         // Update is called once per frame
@@ -58,6 +76,34 @@ namespace VirtualDemonstrator
                 {
                     this.updateCurrentState(t);
                 }
+            }
+        }
+
+        private void UpdateSelectionParentPosition() {
+            foreach(VisualElement selElement in this.selectedVisualElements_) {
+                // temporarily reset parent
+                selElement.transform.SetParent(null);
+            }
+            this.selectionParent.localScale = Vector3.one;
+            // set parent to the midpoint of the objects
+            Vector3 positionMidPt = Vector3.zero;
+            Quaternion rotationMidPt = Quaternion.identity;
+            int i = 0;
+            foreach(VisualElement selElement in this.selectedVisualElements_) {
+                positionMidPt += selElement.transform.position;
+                if (i == 0) {
+                    rotationMidPt = selElement.transform.rotation;
+                } else {
+                    float weight = 1.0f / (float)(i+1);
+                    rotationMidPt = Quaternion.Slerp(rotationMidPt, selElement.transform.rotation, weight);
+                }
+                i += 1;
+            }
+            positionMidPt = positionMidPt / this.selectedVisualElements_.Count;
+            this.selectionParent.position = positionMidPt;
+            this.selectionParent.rotation = rotationMidPt;
+            foreach(VisualElement selElement in this.selectedVisualElements_) {
+                selElement.transform.SetParent(this.selectionParent);
             }
         }
 
@@ -80,7 +126,47 @@ namespace VirtualDemonstrator
             }
         }
 
-        // This function
+        /// Adds element to collection of selected visual elements.
+        /// Then updates parents of elements, to keep selected elements
+        /// as child of one parent.
+        public void AddSelectedElement(VisualElement element) {
+            element.SelectEntered();
+            this.selectedVisualElements_.Add(element);
+            this.UpdateSelectionParentPosition();
+            element.transform.SetParent(this.selectionParent);
+        }
+        
+        /// Remove element from collection of selected visual element.
+        /// Then update parents of elements, to keep selected elements
+        /// as child of one parent.
+        public void RemoveSelectedElement(VisualElement element) {
+            element.SelectExited();
+            this.selectedVisualElements_.Remove(element);
+            this.UpdateSelectionParentPosition();
+            element.transform.SetParent(this.nonSelectionParent);
+        }
+
+        /// Updates the states of all selected elements by calling
+        /// element.UpdateState()
+        public void updateSelectedElementStates() {
+            foreach(VisualElement element in this.selectedVisualElements_) {
+                element.UpdateState();
+            }
+        }
+
+        /// Removes all elements from collection and resets their parents.
+        public void ClearSelectedElements() {
+            foreach(VisualElement element in this.selectedVisualElements_) {
+                element.SelectExited();
+                element.transform.SetParent(this.nonSelectionParent);
+            }
+            this.selectedVisualElements_ = new HashSet<VisualElement>();
+            this.selectionParent.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            this.selectionParent.localScale = Vector3.one;
+        }
+
+        /// Adds a new state at the provided index. The default index (-1)
+        /// will add a new state to the end of the state list.
         public void InsertNewState(int index = -1)
         {
             // Create the new state based on the current workspace conditions.

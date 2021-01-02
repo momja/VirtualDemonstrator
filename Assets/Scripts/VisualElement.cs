@@ -29,26 +29,26 @@ namespace VirtualDemonstrator {
             state.SetStateRotation(this.gameObject.transform.rotation);
         }
 
-        public void onHoverEntered() {
+        public void HoverEntered() {
             outline.enabled = true;
             if (!selected) {
                 outline.OutlineColor = hoverColor;
             }
         }
 
-        public void onHoverExited() {
+        public void HoverExited() {
             if (!selected) {
                 outline.enabled = false;
             }
         }
 
-        public void onSelectEntered() {
+        public void SelectEntered() {
             outline.enabled = true;
             outline.OutlineColor = selectColor;
             selected = true;
         }
 
-        public void onSelectExited() {
+        public void SelectExited() {
             outline.enabled = false;
             selected = false;
         }
