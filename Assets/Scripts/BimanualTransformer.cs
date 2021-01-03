@@ -91,7 +91,7 @@ namespace VirtualDemonstrator
                     miniObject = null;
                     lineBtwnControllers.enabled = false;
                 }
-                Workspace.Instance.updateSelectedElementStates();
+                Workspace.Instance.UpdateSelectedElementStates();
                 action = TransformAction.IDLE;
             }
 

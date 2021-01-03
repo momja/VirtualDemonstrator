@@ -36,6 +36,8 @@ namespace VirtualDemonstrator
         private int stateIndex;
         private WorkspaceState _prevState;
         private WorkspaceState _curState;
+        private int goalStateFrame = -1;
+        private int startStateFrame = -1;
         private bool isLerping = false;
         private float lerpT = 0;
 
@@ -64,17 +66,22 @@ namespace VirtualDemonstrator
         // Update is called once per frame
         private void Update()
         {
-            if (this.isLerping)
+            if (goalStateFrame != startStateFrame)
             {
                 this.lerpT += 0.01f;
                 float t = Easings.easeInOut(this.lerpT);
                 if (this.lerpT > 1)
                 {
-                    this.isLerping = false;
+                    if (this.stateIndex != goalStateFrame) {
+                        this.stateIndex = stateIndex + (int)Mathf.Sign(goalStateFrame-stateIndex)*1;
+                        this._prevState = this._curState;
+                        this._curState = GetStateAtTime(this.stateIndex);
+                        this.lerpT = 0.0f;
+                    }
                 }
                 else if (this._curState != null)
                 {
-                    this.updateCurrentState(t);
+                    this.UpdateCurrentState(t);
                 }
             }
         }
@@ -107,16 +114,35 @@ namespace VirtualDemonstrator
             }
         }
 
+        private void RefreshSelection() {
+            HashSet<VisualElement> newSelection = new HashSet<VisualElement>();
+            foreach(VisualElement element in this.selectedVisualElements_) {
+                if (this._curState.ElementExists(element)) {
+                    newSelection.Add(element);
+                }
+                else {
+                    element.SelectExited();
+                    element.transform.SetParent(this.nonSelectionParent);
+                }
+            }
+            this.UpdateSelectionParentPosition();
+            this.selectedVisualElements_ = newSelection;
+        }
+
         public void OnTimelineChanged(int index)
         {
-            if (!isLerping) {
-                Debug.Log(index);
-                this._prevState = this._curState;
-                this.stateIndex = index;
-                _curState = GetStateAtTime(index);
-                this.isLerping = true;
-                this.lerpT = 0;
+            Debug.Log(index);
+            if (index == stateIndex) {
+                return;
             }
+            this._prevState = this._curState;
+            this.startStateFrame = this.stateIndex;
+            this.goalStateFrame = index;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this._curState = GetStateAtTime(stateIndex);
+            this.lerpT = 0;
+            // refresh selection, remove any elements that arent in the current state
+            RefreshSelection();
         }
 
         public void InsertNewElement(VisualElement element) {
@@ -148,7 +174,7 @@ namespace VirtualDemonstrator
 
         /// Updates the states of all selected elements by calling
         /// element.UpdateState()
-        public void updateSelectedElementStates() {
+        public void UpdateSelectedElementStates() {
             foreach(VisualElement element in this.selectedVisualElements_) {
                 element.UpdateState();
             }
@@ -223,7 +249,7 @@ namespace VirtualDemonstrator
             return this.stateHistory_[stateIndex];
         }
 
-        public void updateCurrentState(float t) {
+        public void UpdateCurrentState(float t) {
             // set the transforms
             this._curState.updateAllStates(this._prevState, t);
         }
