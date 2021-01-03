@@ -68,7 +68,7 @@ namespace VirtualDemonstrator
         {
             if (goalStateFrame != startStateFrame)
             {
-                this.lerpT += 0.01f;
+                this.lerpT += 0.01f * Mathf.Abs(goalStateFrame - startStateFrame);
                 float t = Easings.easeInOut(this.lerpT);
                 if (this.lerpT > 1)
                 {
@@ -87,6 +87,11 @@ namespace VirtualDemonstrator
         }
 
         private void UpdateSelectionParentPosition() {
+            if (this.selectedVisualElements_.Count == 0) {
+                this.selectionParent.position = Vector3.zero;
+                this.selectionParent.rotation = Quaternion.identity;
+                return;
+            }
             foreach(VisualElement selElement in this.selectedVisualElements_) {
                 // temporarily reset parent
                 selElement.transform.SetParent(null);

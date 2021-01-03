@@ -59,17 +59,17 @@ namespace VRKeys {
 		private string prefsKey = "vrkeys:placement";
 
 		void Awake () {
-			keyboard = GetComponent<Keyboard> ();
+			// keyboard = GetComponent<Keyboard> ();
 
-			if (PlayerPrefs.HasKey (prefsKey)) {
-				JsonUtility.FromJsonOverwrite (PlayerPrefs.GetString (prefsKey), settings);
-			}
+			// if (PlayerPrefs.HasKey (prefsKey)) {
+			// 	JsonUtility.FromJsonOverwrite (PlayerPrefs.GetString (prefsKey), settings);
+			// }
 
-			keyboard.keyboardWrapper.transform.localPosition = settings.position;
-			keyboard.keyboardWrapper.transform.localRotation = settings.rotation;
-			keyboard.keyboardWrapper.transform.localScale = settings.scale;
+			// keyboard.keyboardWrapper.transform.localPosition = settings.position;
+			// keyboard.keyboardWrapper.transform.localRotation = settings.rotation;
+			// keyboard.keyboardWrapper.transform.localScale = settings.scale;
 
-			initialScale = keyboard.keyboardWrapper.transform.localScale;
+			// initialScale = keyboard.keyboardWrapper.transform.localScale;
 		}
 
 		void Update () {

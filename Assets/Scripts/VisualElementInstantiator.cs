@@ -11,7 +11,6 @@ namespace VirtualDemonstrator
         public void InstantiateVisualElement()
         {
             GameObject visualElement = Instantiate(visualElementPrefab, transform.position, transform.rotation);
-            visualElement.transform.localScale = transform.localScale * 3f;
             menu_.AddElement(visualElement.GetComponent<VisualElement>());
         }
 

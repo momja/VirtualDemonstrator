@@ -10,9 +10,11 @@
 
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Events;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 
 namespace VRKeys {
@@ -33,23 +35,7 @@ namespace VRKeys {
 		public KeyboardLayout keyboardLayout = KeyboardLayout.Qwerty;
 
 		[Space (15)]
-		public TextMeshProUGUI placeholder;
-
-		public string placeholderMessage = "Tap the keys to begin typing";
-
 		public TextMeshProUGUI displayText;
-
-		public GameObject validationNotice;
-
-		public TextMeshProUGUI validationMessage;
-
-		public GameObject infoNotice;
-
-		public TextMeshProUGUI infoMessage;
-
-		public GameObject successNotice;
-
-		public TextMeshProUGUI successMessage;
 
 		[Space (15)]
 		public Color displayTextColor = Color.black;
@@ -69,7 +55,7 @@ namespace VRKeys {
 		public string text = "";
 
 		[Space (15)]
-		public GameObject canvas;
+		public InputDevice CameraNode;
 
 		public GameObject leftMallet;
 
@@ -131,6 +117,12 @@ namespace VRKeys {
 		private IEnumerator Start () {
 			XRDevice.SetTrackingSpaceType (TrackingSpaceType.RoomScale);
 
+			// Get Camera
+			List<InputDevice> Cameras = new List<InputDevice>();
+			var cameraCharacteristices = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice;
+			InputDevices.GetDevicesWithCharacteristics(cameraCharacteristices, Cameras);
+			CameraNode = Cameras[0];
+
 			playerSpace = new GameObject ("Play Space");
 			//playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
 			//playerSpace.transform.localRotation = InputTracking.GetLocalRotation (XRNode.TrackingReference);
@@ -140,40 +132,25 @@ namespace VRKeys {
 
 			yield return StartCoroutine (DoSetLanguage (keyboardLayout));
 
-			validationNotice.SetActive (false);
-			infoNotice.SetActive (false);
-			successNotice.SetActive (false);
-
 			UpdateDisplayText ();
-			PlaceholderVisibility ();
 
 			initialized = true;
 		}
 
 		private void Update () {
-			//playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
-			//playerSpace.transform.localRotation = InputTracking.GetLocalRotation (XRNode.TrackingReference);
+			// playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
+			// playerSpace.transform.localRotation = InputTracking.GetLocalRotation (XRNode.TrackingReference);
+			Vector3 cameraPosition = Vector3.zero;
+			bool success = CameraNode.TryGetFeatureValue(CommonUsages.centerEyePosition, out cameraPosition);
+			print (success);
+			transform.localPosition = positionRelativeToUser + cameraPosition;
+			print(cameraPosition);
 
-			leftHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.LeftHand);
-			leftHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.LeftHand);
+			// leftHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.LeftHand);
+			// leftHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.LeftHand);
 
-			rightHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.RightHand);
-			rightHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.RightHand);
-		}
-
-		private void PositionAndAttachMallets () {
-			transform.SetParent (playerSpace.transform, false);
-			transform.localPosition = positionRelativeToUser;
-
-			leftMallet.transform.SetParent (leftHand.transform);
-			leftMallet.transform.localPosition = Vector3.zero;
-			leftMallet.transform.localRotation = Quaternion.Euler (90f, 0f, 0f);
-			leftMallet.SetActive (true);
-
-			rightMallet.transform.SetParent (rightHand.transform);
-			rightMallet.transform.localPosition = Vector3.zero;
-			rightMallet.transform.localRotation = Quaternion.Euler (90f, 0f, 0f);
-			rightMallet.SetActive (true);
+			// rightHand.transform.localPosition = InputTracking.GetLocalPosition (XRNode.RightHand);
+			// rightHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.RightHand);
 		}
 
 		private void DetachMallets () {
@@ -206,17 +183,11 @@ namespace VRKeys {
 
 			disabled = false;
 
-			if (canvas != null) {
-				canvas.SetActive (true);
-			}
-
 			if (keysParent != null) {
 				keysParent.gameObject.SetActive (true);
 			}
 
 			EnableInput ();
-
-			PositionAndAttachMallets ();
 		}
 
 		private IEnumerator EnableWhenInitialized () {
@@ -230,10 +201,6 @@ namespace VRKeys {
 		/// </summary>
 		public void Disable () {
 			disabled = true;
-
-			if (canvas != null) {
-				canvas.SetActive (false);
-			}
 
 			if (keysParent != null) {
 				keysParent.gameObject.SetActive (false);
@@ -250,7 +217,6 @@ namespace VRKeys {
 			text = txt;
 
 			UpdateDisplayText ();
-			PlaceholderVisibility ();
 
 			OnUpdate.Invoke (text);
 		}
@@ -263,7 +229,6 @@ namespace VRKeys {
 			text += character;
 
 			UpdateDisplayText ();
-			PlaceholderVisibility ();
 
 			OnUpdate.Invoke (text);
 
@@ -324,8 +289,6 @@ namespace VRKeys {
 			leftPressing = false;
 			rightPressing = false;
 
-			PositionAndAttachMallets ();
-
 			if (keys != null) {
 				foreach (LetterKey key in keys) {
 					if (key != null) {
@@ -348,7 +311,6 @@ namespace VRKeys {
 			}
 
 			UpdateDisplayText ();
-			PlaceholderVisibility ();
 
 			OnUpdate.Invoke (text);
 		}
@@ -380,8 +342,6 @@ namespace VRKeys {
 			keyboardLayout = lang;
 			layout = LayoutList.GetLayout (keyboardLayout);
 
-			placeholderMessage = layout.placeholderMessage;
-
 			yield return StartCoroutine (SetupKeys ());
 
 			// Update extra keys
@@ -391,85 +351,10 @@ namespace VRKeys {
 		}
 
 		/// <summary>
-		/// Set a custom placeholder message.
-		/// </summary>
-		/// <param name="msg">Message.</param>
-		public void SetPlaceholderMessage (string msg) {
-			StartCoroutine (DoSetPlaceholderMessage (msg));
-		}
-
-		private IEnumerator DoSetPlaceholderMessage (string msg) {
-			if (!initialized) {
-				yield return new WaitUntil (() => initialized);
-			}
-
-			placeholder.text = placeholderMessage = msg;
-
-			yield break;
-		}
-
-		/// <summary>
-		/// Show the specified validation notice.
-		/// </summary>
-		/// <param name="message">Message to show.</param>
-		public void ShowValidationMessage (string message) {
-			validationMessage.text = message;
-			validationNotice.SetActive (true);
-			infoNotice.SetActive (false);
-			successNotice.SetActive (false);
-		}
-
-		/// <summary>
-		/// Show the specified input notice.
-		/// </summary>
-		/// <param name="message">Message to show.</param>
-		public void ShowInfoMessage (string message) {
-			infoMessage.text = message;
-			validationNotice.SetActive (false);
-			infoNotice.SetActive (true);
-			successNotice.SetActive (false);
-		}
-
-		/// <summary>
-		/// Show the specified success notice.
-		/// </summary>
-		/// <param name="message">Message to show.</param>
-		public void ShowSuccessMessage (string message) {
-			successMessage.text = message;
-			validationNotice.SetActive (false);
-			infoNotice.SetActive (false);
-			successNotice.SetActive (true);
-		}
-
-		/// <summary>
-		/// Hide the validation notice.
-		/// </summary>
-		public void HideValidationMessage () {
-			validationNotice.SetActive (false);
-		}
-
-		/// <summary>
-		/// Hide the info notice.
-		/// </summary>
-		public void HideInfoMessage () {
-			infoNotice.SetActive (false);
-		}
-
-		/// <summary>
-		/// Hide the success notice.
-		/// </summary>
-		public void HideSuccessMessage () {
-			successNotice.SetActive (false);
-		}
-
-		/// <summary>
 		/// Setup the keys.
 		/// </summary>
 		private IEnumerator SetupKeys () {
-			bool activeState = canvas.activeSelf;
-
 			// Hide everything before setting up the keys
-			canvas.SetActive (false);
 			keysParent.gameObject.SetActive (false);
 
 			// Remove previous keys
@@ -567,15 +452,18 @@ namespace VRKeys {
 				yield return null;
 			}
 
-			// Reset visibility of canvas and keyboard
-			canvas.SetActive (activeState);
-			keysParent.gameObject.SetActive (activeState);
+			// Reset visibility of keyboard
+			keysParent.gameObject.SetActive (!disabled);
 		}
 
 		/// <summary>
 		/// Update the display text, including trailing caret.
 		/// </summary>
 		private void UpdateDisplayText () {
+			if (displayText == null) {
+				return;
+			}
+
 			string display = (text.Length > 37) ? text.Substring (text.Length - 37) : text;
 
 			displayText.text = string.Format (
@@ -584,18 +472,6 @@ namespace VRKeys {
 				display,
 				ColorUtility.ToHtmlStringRGB (caretColor)
 			);
-		}
-
-		/// <summary>
-		/// Show/hide placeholder text.
-		/// </summary>
-		private void PlaceholderVisibility () {
-			if (text == "") {
-				placeholder.text = placeholderMessage;
-				placeholder.gameObject.SetActive (true);
-			} else {
-				placeholder.gameObject.SetActive (false);
-			}
 		}
 	}
 }

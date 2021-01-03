@@ -8,7 +8,7 @@ namespace VirtualDemonstrator {
         public VisualElementState(VisualElement element)
         {
             this.element_ = element;
-            stateColor_ = element.gameObject.GetComponent<Renderer>().material.color;
+            stateMaterial_ = element.GetComponent<Renderer>().material;
             statePosition_ = element.gameObject.transform.position;
             stateScale_ = element.gameObject.transform.localScale;
             stateRotation_ = element.gameObject.transform.rotation;
@@ -20,7 +20,7 @@ namespace VirtualDemonstrator {
             this.statePosition_ = newState.GetStatePosition();
             this.stateScale_ = newState.GetStateScale();
             this.stateRotation_ = newState.GetStateRotation();
-            this.stateColor_ = newState.GetStateColor();
+            this.stateMaterial_ = newState.GetStateMaterial();
         }
 
         // This function assigns a blend of this state with another.
@@ -42,15 +42,14 @@ namespace VirtualDemonstrator {
                 element_.gameObject.transform.rotation = lerpedRotation;
 
                 // Lerp the main colors of each material and assign it.
-
-                Color lerpedColor = Color.Lerp(this.stateColor_, secondState.GetStateColor(), t);
-                element_.gameObject.GetComponent<Renderer>().material.color = lerpedColor;
+                Renderer rend = element_.GetComponent<Renderer>();
+                rend.material.Lerp(this.stateMaterial_, secondState.GetStateMaterial(), t);
             }
         }
 
         // Getter functions for the state's data.
         public VisualElement GetStateElement() { return element_; }
-        public Color GetStateColor() { return stateColor_; }
+        public Material GetStateMaterial() { return stateMaterial_; }
         public Vector3 GetStatePosition() { return statePosition_; }
         public Vector3 GetStateScale() { return stateScale_; }
         public Quaternion GetStateRotation() { return stateRotation_; }
@@ -58,11 +57,12 @@ namespace VirtualDemonstrator {
         public void SetStatePosition(Vector3 newPosition) { statePosition_ = newPosition; }
         public void SetStateScale(Vector3 newScale) { stateScale_ = newScale; }
         public void SetStateRotation(Quaternion newRotation) { stateRotation_ = newRotation; }
+        public void SetStateMaterial(Material material) { stateMaterial_ = material; }
 
         // Each visual state keeps track of the correspending element's transform and material
         // at the time the state was instantiated.
         private VisualElement element_;
-        private Color stateColor_;
+        private Material stateMaterial_;
         private Vector3 statePosition_;
         private Vector3 stateScale_;
         private Quaternion stateRotation_;
