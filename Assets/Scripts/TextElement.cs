@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using TMPro;
 
 namespace VirtualDemonstrator {
     public class TextElement : VisualElement {
         public TextMeshProUGUI text;
+        public Image panel;
         public bool isEditing = false;
         public VRKeys.Keyboard keyboard;
 
@@ -17,6 +19,7 @@ namespace VirtualDemonstrator {
             this.keyboard.OnSubmit.AddListener(text => DeactivateKeyboard());
             this.OnSelect.AddListener(ActivateKeyboard);
             this.OnSelectExit.AddListener(DeactivateKeyboard);
+            this.outline = this.text.GetComponent<Outline>();
         }
 
         public void ActivateKeyboard() {
@@ -33,5 +36,31 @@ namespace VirtualDemonstrator {
             workspace.HideMenuAndTimeline(false);
         }
 
+        public override void HoverEntered()
+        {
+            if (!selected) {
+                panel.color = hoverColor;
+            }
+            base.HoverEntered();
+        }
+
+        public override void HoverExited()
+        {
+            if (!selected) {
+                panel.color = Color.clear;
+            }
+            base.HoverExited();
+        }
+
+        public override void SelectEntered()
+        {
+            panel.color = selectColor;
+            base.SelectEntered();
+        }
+
+        public override void SelectExited() {
+            panel.color = Color.clear;
+            base.SelectExited();
+        }
     }
 }

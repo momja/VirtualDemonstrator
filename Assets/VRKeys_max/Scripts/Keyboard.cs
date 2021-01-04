@@ -181,7 +181,7 @@ namespace VRKeys
             }
 
             PositionInFrontOfUser();
-
+            UpdateDisplayText();
             EnableInput();
         }
 
@@ -216,6 +216,8 @@ namespace VRKeys
             {
                 keysParent.gameObject.SetActive(false);
             }
+
+            UpdateDisplayText();
         }
 
         /// <summary>
@@ -509,14 +511,14 @@ namespace VRKeys
                 return;
             }
 
-            string display = (text.Length > 37) ? text.Substring(text.Length - 37) : text;
+            string display = text;
 
             displayText.text = string.Format(
                 "<#{0}>{1}</color><#{2}>{3}</color>",
                 ColorUtility.ToHtmlStringRGB(displayTextColor),
                 display,
                 ColorUtility.ToHtmlStringRGB(caretColor),
-				!disabled ? "_" : ""
+				!disabled ? "▌" : ""
             );
         }
     }

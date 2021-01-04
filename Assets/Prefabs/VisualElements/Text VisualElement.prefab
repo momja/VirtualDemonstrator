@@ -27,16 +27,16 @@ RectTransform:
   m_GameObject: {fileID: 1468868370743627597}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 648381937948582310}
   m_Father: {fileID: 7569230361089002941}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 3.5, y: 0.25}
+  m_SizeDelta: {x: 1.63, y: 0.38}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3337499721152060848
 Canvas:
@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 7545144900778936722}
   - component: {fileID: 5653420263073762162}
   - component: {fileID: 8618561100807342864}
+  - component: {fileID: 6146392388830537918}
   m_Layer: 0
   m_Name: Text Input
   m_TagString: Untagged
@@ -175,7 +176,7 @@ MonoBehaviour:
   m_fontSizeMin: 0
   m_fontSizeMax: 0
   m_fontStyle: 0
-  m_textAlignment: 257
+  m_textAlignment: 264
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -232,6 +233,24 @@ MonoBehaviour:
   - {fileID: 0}
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6146392388830537918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4334974128890798154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 0.30996993, g: 0.9433962, b: 0.06674972, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &7569230361089002938
 GameObject:
   m_ObjectHideFlags: 0
@@ -296,8 +315,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.6271214, y: 0.14014304, z: 0.06319587}
-  m_Center: {x: -0.056786746, y: -0.009726822, z: -0.0024466738}
+  m_Size: {x: 1.6103706, y: 0.39159286, z: 0.06319587}
+  m_Center: {x: 0.0077281, y: -0.004439056, z: -0.0024466738}
 --- !u!114 &8531240137685054647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,7 +340,7 @@ MonoBehaviour:
   m_OnHoverEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 7569230361089002937}
         m_MethodName: HoverEntered
         m_Mode: 1
         m_Arguments:
@@ -335,7 +354,7 @@ MonoBehaviour:
   m_OnHoverExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 7569230361089002937}
         m_MethodName: HoverExited
         m_Mode: 1
         m_Arguments:
@@ -409,6 +428,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed4fbb841e2462d4d9a063e5ab28ab78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hoverColor: {r: 0.902, g: 0.945, b: 0.0706, a: 1}
+  selectColor: {r: 0.109, g: 0.925, b: 0.27, a: 1}
   OnHover:
     m_PersistentCalls:
       m_Calls: []
@@ -423,6 +444,7 @@ MonoBehaviour:
       m_Calls: []
   workspace: {fileID: 0}
   text: {fileID: 8618561100807342864}
+  panel: {fileID: 8158227692099972621}
   isEditing: 0
   keyboard: {fileID: 0}
 --- !u!114 &1535403809526060211
@@ -507,7 +529,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8259995128789004407}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -515,10 +537,10 @@ RectTransform:
   m_Father: {fileID: 8839593952776872214}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1.63, y: 0.38}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &811462924532171628
 CanvasRenderer:
@@ -541,19 +563,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.3018868, g: 0.3018868, b: 0.3018868, a: 0}
+  m_Color: {r: 1, g: 0.37222314, b: 0, a: 0}
   m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: c47db22c444671d42832498b6c54354e, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
-  m_FillCenter: 1
+  m_FillCenter: 0
   m_FillMethod: 4
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 78.85
