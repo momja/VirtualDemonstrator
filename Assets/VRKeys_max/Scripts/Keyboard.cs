@@ -152,19 +152,6 @@ namespace VRKeys
             // rightHand.transform.localRotation = InputTracking.GetLocalRotation (XRNode.RightHand);
         }
 
-        private void DetachMallets()
-        {
-            if (leftMallet != null)
-            {
-                leftMallet.SetActive(false);
-            }
-
-            if (rightMallet != null)
-            {
-                rightMallet.SetActive(false);
-            }
-        }
-
         /// <summary>
         /// Make sure mallets don't stay attached if VRKeys is disabled without
         /// calling Disable().
@@ -229,8 +216,6 @@ namespace VRKeys
             {
                 keysParent.gameObject.SetActive(false);
             }
-
-            DetachMallets();
         }
 
         /// <summary>
@@ -363,9 +348,9 @@ namespace VRKeys
         /// </summary>
         public void Submit()
         {
-            OnSubmit.Invoke(text);
-			Disable();
+            Disable();
 			UpdateDisplayText();
+            OnSubmit.Invoke(text);
         }
 
         /// <summary>

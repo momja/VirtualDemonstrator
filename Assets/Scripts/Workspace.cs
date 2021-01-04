@@ -273,5 +273,10 @@ namespace VirtualDemonstrator
             int cnt = this.stateHistory_.Count - this.stateIndex;
             return this.stateHistory_.GetRange(this.stateIndex, cnt);
         }
+
+        public void HideMenuAndTimeline(bool hide) {
+            menuPanel.gameObject.SetActive(!hide);
+            timeline.gameObject.SetActive(!hide);
+        }
     }
 }

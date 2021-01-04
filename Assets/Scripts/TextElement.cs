@@ -14,6 +14,7 @@ namespace VirtualDemonstrator {
         {
             base.Start();
             this.keyboard = FindObjectOfType<VRKeys.Keyboard>();
+            this.keyboard.OnSubmit.AddListener(text => DeactivateKeyboard());
             this.OnSelect.AddListener(ActivateKeyboard);
             this.OnSelectExit.AddListener(DeactivateKeyboard);
         }
@@ -22,12 +23,14 @@ namespace VirtualDemonstrator {
             isEditing = true;
             this.keyboard.Enable();
             this.keyboard.displayText = this.text;
+            workspace.HideMenuAndTimeline(true);
         }
 
         public void DeactivateKeyboard() {
             isEditing = false;
             this.keyboard.Disable();
             this.keyboard.displayText = null;
+            workspace.HideMenuAndTimeline(false);
         }
 
     }
