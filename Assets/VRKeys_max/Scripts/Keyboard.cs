@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Events;
+using XRExtenders;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -121,10 +122,7 @@ namespace VRKeys
             XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
 
             // Get Camera
-            List<InputDevice> Cameras = new List<InputDevice>();
-            var cameraCharacteristices = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice;
-            InputDevices.GetDevicesWithCharacteristics(cameraCharacteristices, Cameras);
-            CameraNode = Cameras[0];
+            CameraNode = XRExtenders.XRHelpers.GetCameraNode();
 
             playerSpace = new GameObject("Play Space");
             //playerSpace.transform.localPosition = InputTracking.GetLocalPosition (XRNode.TrackingReference);
@@ -181,7 +179,7 @@ namespace VRKeys
             }
 
             PositionInFrontOfUser();
-
+            UpdateDisplayText();
             EnableInput();
         }
 
@@ -216,6 +214,8 @@ namespace VRKeys
             {
                 keysParent.gameObject.SetActive(false);
             }
+
+            UpdateDisplayText();
         }
 
         /// <summary>
@@ -509,14 +509,14 @@ namespace VRKeys
                 return;
             }
 
-            string display = (text.Length > 37) ? text.Substring(text.Length - 37) : text;
+            string display = text;
 
             displayText.text = string.Format(
                 "<#{0}>{1}</color><#{2}>{3}</color>",
                 ColorUtility.ToHtmlStringRGB(displayTextColor),
                 display,
                 ColorUtility.ToHtmlStringRGB(caretColor),
-				!disabled ? "_" : ""
+				!disabled ? "▌" : ""
             );
         }
     }

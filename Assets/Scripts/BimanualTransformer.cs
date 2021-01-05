@@ -19,13 +19,18 @@ namespace VirtualDemonstrator
     // This class handles the users actions while an object is selected by the right hand.
     public class BimanualTransformer : MonoBehaviour
     {
+<<<<<<< HEAD
         void Start() {
+=======
+        private void Start()
+        {
+>>>>>>> master
             this.rig = FindObjectOfType<XRRig>();
             this.xrInteractionManager = FindObjectOfType<XRInteractionManager>();
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             // Attempt to reconnect with the left controller if it disconnects.
             if (reconnecting)
@@ -43,6 +48,18 @@ namespace VirtualDemonstrator
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
             bool idle = (prevRecessiveGripDown || prevDominantGripDown) && (!recessiveGripDown && !dominantGripDown);
+
+            bool triggerDown;
+            dominantController.TryGetFeatureValue(CommonUsages.triggerButton, out triggerDown);
+            if (triggerDown) {
+                // if no intersection with visual element, remove all elements
+                if (dominantInteractor.selectTarget == null) {
+                    // remove all selection
+                    Workspace.Instance.ClearSelectedElements();
+                    selecting = false;
+                    Workspace.Instance.DetachMenu();
+                }
+            }
 
             Workspace.Instance.selectionParent.SetParent(null);
 
@@ -71,7 +88,7 @@ namespace VirtualDemonstrator
                     // get the current distance between the controllers to act as the "0-value".
                     Vector3 positionDifference = recessiveControllerObject.transform.InverseTransformPoint(dominantControllerObject.transform.position);
                     startingDistance = positionDifference.magnitude;
-                    
+
                     // Determine which axis to start scaling based on the xyz distances of the controllers.
                     float maxAxis = Mathf.Max(Mathf.Abs(positionDifference.x), Mathf.Max(Mathf.Abs(positionDifference.y), positionDifference.z));
                     if (maxAxis == Mathf.Abs(positionDifference.x))
@@ -91,7 +108,9 @@ namespace VirtualDemonstrator
             else if (recessiveGripDown && !prevRecessiveGripDown)
             {
                 // Rotation
-                if (miniObject != null) {
+                Workspace.Instance.HideMenuAndTimeline(true);
+                if (miniObject != null)
+                {
                     GameObject.Destroy(miniObject.gameObject, 0);
                     miniObject = null;
                     lineBtwnControllers.enabled = false;
@@ -105,8 +124,9 @@ namespace VirtualDemonstrator
             else if (dominantGripDown && !prevDominantGripDown)
             {
                 // Translation
-                if (miniObject != null) {
-                     GameObject.Destroy(miniObject.gameObject, 0);
+                if (miniObject != null)
+                {
+                    GameObject.Destroy(miniObject.gameObject, 0);
                     miniObject = null;
                     lineBtwnControllers.enabled = false;
                 }
@@ -117,7 +137,9 @@ namespace VirtualDemonstrator
             else if (idle)
             {
                 // Idle
-                if (miniObject != null) {
+                Workspace.Instance.HideMenuAndTimeline(false);
+                if (miniObject != null)
+                {
                     GameObject.Destroy(miniObject.gameObject, 0);
                     miniObject = null;
                     lineBtwnControllers.enabled = false;
@@ -147,7 +169,7 @@ namespace VirtualDemonstrator
                     // Set miniobject position
                     miniObject.position = ctrlMidpoint;
                     miniObject.rotation = RotationAlongControllerAxis();
-                    miniObject.transform.localScale = 0.1f*Workspace.Instance.selectionParent.localScale;
+                    miniObject.transform.localScale = 0.1f * Workspace.Instance.selectionParent.localScale;
 
                     // Set positions of Line Renderer
                     lineBtwnControllers.SetPosition(0, recessiveControllerObject.transform.position);
@@ -176,7 +198,7 @@ namespace VirtualDemonstrator
                         scalingFactor.z = scaleValue * 30;
                     }
 
-                    // Clamp the scale to non-negative values. 
+                    // Clamp the scale to non-negative values.
                     Vector3 frameContribution = scalingElement + scalingFactor;
                     if (frameContribution.x < 0)
                     {
@@ -198,6 +220,24 @@ namespace VirtualDemonstrator
                 {
 
                 }
+            }
+
+            Vector3 bounds = Workspace.Instance.workspaceBounds.bounds;
+            List<VisualElement> outOfBoundsElements = new List<VisualElement>();
+            bool allElementsInBounds = true;
+            foreach (VisualElement element in Workspace.Instance.selVisualElements)
+            {
+                if (!Workspace.Instance.workspaceBounds.InBounds(element.transform))
+                {
+                    // out of bounds
+                    // if selecting is off, delete, if selecting is on set boundaries on
+                    Workspace.Instance.workspaceBounds.HideWalls(false);
+                    allElementsInBounds = false;
+                }
+            }
+            if (allElementsInBounds)
+            {
+                Workspace.Instance.workspaceBounds.HideWalls(true);
             }
         }
 
@@ -239,25 +279,50 @@ namespace VirtualDemonstrator
         private Vector3 ClipVec(Vector3 vec,
                                 float clipMinX = 0, float clipMaxX = Mathf.Infinity,
                                 float clipMinY = 0, float clipMaxY = Mathf.Infinity,
-                                float clipMinZ = 0, float clipMaxZ = Mathf.Infinity) {
+                                float clipMinZ = 0, float clipMaxZ = Mathf.Infinity)
+        {
             return new Vector3(Mathf.Clamp(vec.x, clipMinX, clipMaxX),
                                Mathf.Clamp(vec.y, clipMinY, clipMaxY),
                                Mathf.Clamp(vec.z, clipMinZ, clipMaxZ));
         }
 
         // Finds the world space point between the dominant and recessive controllers.
-        private Vector3 ControllerMidpoint() {
+        private Vector3 ControllerMidpoint()
+        {
             Vector3 domToRec = recessiveControllerObject.transform.position - dominantControllerObject.transform.position;
-            float domToRecMid = domToRec.magnitude/2;
+            float domToRecMid = domToRec.magnitude / 2;
             Vector3 midpoint = dominantControllerObject.transform.position + domToRecMid * domToRec.normalized;
             return midpoint;
         }
 
-        private Quaternion RotationAlongControllerAxis() {
+        private Quaternion RotationAlongControllerAxis()
+        {
             Vector3 forward = this.ControllerMidpoint() - this.rig.transform.position;
             forward.y = 0; // Cancel up direction component
             Vector3 upward = Vector3.up;
             return Quaternion.LookRotation(forward, upward);
+        }
+
+        private void CleanupOutOfBounds()
+        {
+            // Check if any object is outside bounds
+            Vector3 bounds = Workspace.Instance.workspaceBounds.bounds;
+            List<VisualElement> outOfBoundsElements = new List<VisualElement>();
+            foreach (VisualElement element in Workspace.Instance.selVisualElements)
+            {
+                if (!Workspace.Instance.workspaceBounds.InBounds(element.transform))
+                {
+                    // out of bounds
+                    // if selecting is off, delete, if selecting is on set boundaries on
+                    outOfBoundsElements.Add(element);
+                }
+            }
+            // remove out of bounds elements
+            foreach (VisualElement element in outOfBoundsElements)
+            {
+                Workspace.Instance.DeleteElement(element);
+            }
+
         }
 
         // This method gets called whenever the dominant controller selects an object.
@@ -271,12 +336,19 @@ namespace VirtualDemonstrator
                 // remove all selection
                 Workspace.Instance.ClearSelectedElements();
                 selecting = false;
-            } else if (Workspace.Instance.selVisualElements.Contains(selVisElem)) {
+                Workspace.Instance.DetachMenu();
+            }
+            else if (Workspace.Instance.selVisualElements.Contains(selVisElem))
+            {
                 // remove from list
+                CleanupOutOfBounds();
                 Workspace.Instance.RemoveSelectedElement(selVisElem);
-            } else {
+            }
+            else
+            {
                 // add new element
                 Workspace.Instance.AddSelectedElement(selVisElem);
+                Workspace.Instance.AttachMenu(selVisElem);
                 selecting = true;
             }
         }

@@ -38,6 +38,16 @@ namespace VirtualDemonstrator {
             Debug.Log("Element count: " + elementStates.Count);
         }
 
+        /// Finds the existing element and removes it from the state workspace,
+        /// while also deleting the VisualElementState. Does nothing if the object
+        /// does not exist
+        public void RemoveState(VisualElement element) {
+            if (!this.ElementExists(element)) {
+                return;
+            }
+            this.elementStates.Remove(element);
+        }
+
         public Dictionary<VisualElement, VisualElementState> elementStates;
 
         public void updateAllStates(WorkspaceState prevState, float t) {
