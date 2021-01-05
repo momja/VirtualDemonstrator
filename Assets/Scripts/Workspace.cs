@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.EventSystems;
 
 namespace VirtualDemonstrator
@@ -23,11 +24,14 @@ namespace VirtualDemonstrator
 
         public MenuPanel menuPanel;
         public Timeline timeline;
+        public RadialMenu radialMenu;
         public HashSet<VisualElement> selVisualElements {
             get {
                 return selectedVisualElements_;
             }
         }
+        public WorkspaceBounds workspaceBounds;
+        public GameObject rayInteractor;
         public Transform selectionParent;
         public Transform nonSelectionParent;
         private List<WorkspaceState> stateHistory_;
@@ -50,8 +54,7 @@ namespace VirtualDemonstrator
             this.nonSelectionParent = null;
             this.timeline.workspace = this;
             this.menuPanel.workspace_ = this;
-            // this.timelineSlider = this.timeline.GetComponentInChildren<Slider>();
-            // this.timelineSlider.OnPointerUp.AddListener(delegate { OnSliderChanged(); });
+            this.workspaceBounds = GameObject.Find("Workspace Bounds").GetComponent<WorkspaceBounds>();
             InsertNewState();
         }
 
@@ -155,6 +158,15 @@ namespace VirtualDemonstrator
             for (int i = this.stateIndex; i < this.stateHistory_.Count; i++) {
                 this.stateHistory_[i].AddState(element);
             }
+        }
+
+        /// Removes element from the current and following frames by updating the workspace states
+        public void DeleteElement(VisualElement element, int index=-1) {
+            index = index == -1 ? this.stateIndex : index;
+            for (int i = index; i < this.stateHistory_.Count; i++) {
+                this.stateHistory_[i].RemoveState(element);
+            }
+            element.gameObject.transform.localScale = Vector3.zero;
         }
 
         /// Adds element to collection of selected visual elements.
@@ -277,6 +289,20 @@ namespace VirtualDemonstrator
         public void HideMenuAndTimeline(bool hide) {
             menuPanel.gameObject.SetActive(!hide);
             timeline.gameObject.SetActive(!hide);
+        }
+
+        public void KeyboardMode(bool active) {
+            HideMenuAndTimeline(active);
+            rayInteractor.GetComponent<XRRayInteractor>().maxRaycastDistance = active ? 0f : 30f;
+            rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = !active;
+        }
+
+        public void AttachMenu(VisualElement element) {
+            radialMenu.Attach(selectionParent);
+        }
+
+        public void DetachMenu() {
+            radialMenu.Detach();
         }
     }
 }

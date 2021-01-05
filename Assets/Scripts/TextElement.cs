@@ -5,8 +5,10 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 
-namespace VirtualDemonstrator {
-    public class TextElement : VisualElement {
+namespace VirtualDemonstrator
+{
+    public class TextElement : VisualElement
+    {
         public TextMeshProUGUI text;
         public Image panel;
         public bool isEditing = false;
@@ -22,23 +24,27 @@ namespace VirtualDemonstrator {
             this.outline = this.text.GetComponent<Outline>();
         }
 
-        public void ActivateKeyboard() {
+        public void ActivateKeyboard()
+        {
             isEditing = true;
             this.keyboard.Enable();
             this.keyboard.displayText = this.text;
-            workspace.HideMenuAndTimeline(true);
+            this.keyboard.SetText(this.text.text);
+            workspace.KeyboardMode(true);
         }
 
-        public void DeactivateKeyboard() {
+        public void DeactivateKeyboard()
+        {
             isEditing = false;
             this.keyboard.Disable();
             this.keyboard.displayText = null;
-            workspace.HideMenuAndTimeline(false);
+            workspace.KeyboardMode(false);
         }
 
         public override void HoverEntered()
         {
-            if (!selected) {
+            if (!selected)
+            {
                 panel.color = hoverColor;
             }
             base.HoverEntered();
@@ -46,7 +52,8 @@ namespace VirtualDemonstrator {
 
         public override void HoverExited()
         {
-            if (!selected) {
+            if (!selected)
+            {
                 panel.color = Color.clear;
             }
             base.HoverExited();
@@ -58,7 +65,8 @@ namespace VirtualDemonstrator {
             base.SelectEntered();
         }
 
-        public override void SelectExited() {
+        public override void SelectExited()
+        {
             panel.color = Color.clear;
             base.SelectExited();
         }

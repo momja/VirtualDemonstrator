@@ -60,6 +60,11 @@ namespace VirtualDemonstrator {
             selected = false;
         }
 
+        /// Compute the GameObjects bounds
+        public virtual Bounds GetBounds() {
+            return GetComponent<Renderer>().bounds;
+        }
+
 
         // This function returns the Element's GameObject.
         public GameObject GetElementObject() { return this.gameObject; }
