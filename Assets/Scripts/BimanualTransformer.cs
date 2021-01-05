@@ -19,7 +19,6 @@ namespace VirtualDemonstrator
     // This class handles the users actions while an object is selected by the right hand.
     public class BimanualTransformer : MonoBehaviour
     {
-
         void Start() {
             this.rig = FindObjectOfType<XRRig>();
             this.xrInteractionManager = FindObjectOfType<XRInteractionManager>();
@@ -56,10 +55,38 @@ namespace VirtualDemonstrator
                                          ControllerMidpoint(),
                                          RotationAlongControllerAxis(),
                                          null);
-                miniObject.transform.localScale = 0.1f*Workspace.Instance.selectionParent.transform.localScale;
+                miniObject.transform.localScale = 0.1f * Workspace.Instance.selectionParent.transform.localScale;
                 lineBtwnControllers.enabled = true;
                 scalingElement = Workspace.Instance.selectionParent.transform.localScale;
                 action = TransformAction.SCALING;
+
+                // If a scaling operation was just started, define which axis to scale.
+                if (!scalingDown)
+                {
+                    scalingDown = true;
+                    scalingX = false;
+                    scalingY = false;
+                    scalingZ = false;
+
+                    // get the current distance between the controllers to act as the "0-value".
+                    Vector3 positionDifference = recessiveControllerObject.transform.InverseTransformPoint(dominantControllerObject.transform.position);
+                    startingDistance = positionDifference.magnitude;
+                    
+                    // Determine which axis to start scaling based on the xyz distances of the controllers.
+                    float maxAxis = Mathf.Max(Mathf.Abs(positionDifference.x), Mathf.Max(Mathf.Abs(positionDifference.y), positionDifference.z));
+                    if (maxAxis == Mathf.Abs(positionDifference.x))
+                    {
+                        scalingX = true;
+                    }
+                    else if (maxAxis == Mathf.Abs(positionDifference.y))
+                    {
+                        scalingY = true;
+                    }
+                    else
+                    {
+                        scalingZ = true;
+                    }
+                }
             }
             else if (recessiveGripDown && !prevRecessiveGripDown)
             {
@@ -72,6 +99,8 @@ namespace VirtualDemonstrator
                 rotationController = recessiveControllerObject.transform.localRotation;
                 rotationElement = Workspace.Instance.selectionParent.localRotation;
                 action = TransformAction.ROTATION;
+
+                scalingDown = false;
             }
             else if (dominantGripDown && !prevDominantGripDown)
             {
@@ -82,6 +111,8 @@ namespace VirtualDemonstrator
                     lineBtwnControllers.enabled = false;
                 }
                 action = TransformAction.TRANSLATION;
+
+                scalingDown = false;
             }
             else if (idle)
             {
@@ -93,6 +124,8 @@ namespace VirtualDemonstrator
                 }
                 Workspace.Instance.UpdateSelectedElementStates();
                 action = TransformAction.IDLE;
+
+                scalingDown = false;
             }
 
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
@@ -121,19 +154,45 @@ namespace VirtualDemonstrator
                     lineBtwnControllers.SetPosition(1, ctrlMidpoint);
                     lineBtwnControllers.SetPosition(2, dominantControllerObject.transform.position);
 
-                    Vector3 curControllerDiff = (dominantControllerObject.transform.position - recessiveControllerObject.transform.position);
-                    Vector3 scalingFactor = curControllerDiff - scalingController;
-                    scalingFactor = ClipVec(scalingFactor); // Prevent < 0 scales
-                    if (Workspace.Instance.selVisualElements.Count > 1)
+                    // Calculate the scale operation.
+
+                    // Get the current distance between the two controllers and get the difference between the original distance.
+                    Vector3 dominantInRecessiveSpace = recessiveControllerObject.transform.InverseTransformPoint(dominantControllerObject.transform.position);
+                    float currentDistance = dominantInRecessiveSpace.magnitude;
+                    float scaleValue = currentDistance - startingDistance;
+
+                    // Determine what axis to apply the change to.
+                    Vector3 scalingFactor = new Vector3();
+                    if (scalingX)
                     {
-                        // Only allow uniform scaling when multiple objects are selected
-                        float maxScale = Mathf.Max(scalingFactor.x, scalingFactor.y, scalingFactor.z);
-                        Workspace.Instance.selectionParent.localScale = maxScale*Vector3.one + scalingElement;
+                        scalingFactor.x = scaleValue * 30;
+                    }
+                    else if (scalingY)
+                    {
+                        scalingFactor.y = scaleValue * 30;
                     }
                     else
                     {
-                        Workspace.Instance.selectionParent.localScale = scalingElement + scalingFactor;
+                        scalingFactor.z = scaleValue * 30;
                     }
+
+                    // Clamp the scale to non-negative values. 
+                    Vector3 frameContribution = scalingElement + scalingFactor;
+                    if (frameContribution.x < 0)
+                    {
+                        frameContribution.x = 0;
+                    }
+                    if (frameContribution.y < 0)
+                    {
+                        frameContribution.y = 0;
+                    }
+                    if (frameContribution.z < 0)
+                    {
+                        frameContribution.z = 0;
+                    }
+
+                    // Apply the scale contribution.
+                    Workspace.Instance.selectionParent.localScale = frameContribution;
                 }
                 else if (action == TransformAction.IDLE)
                 {
@@ -246,5 +305,11 @@ namespace VirtualDemonstrator
         // This value is true when the left controller loses connection.
         private bool reconnecting = true;
 
+        // Values needed for David's scaling technique.
+        private float startingDistance;
+        private bool scalingDown = true;
+        private bool scalingX = false;
+        private bool scalingY = false;
+        private bool scalingZ = false;
     }
 }
