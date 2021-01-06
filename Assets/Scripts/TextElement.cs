@@ -70,5 +70,11 @@ namespace VirtualDemonstrator
             panel.color = Color.clear;
             base.SelectExited();
         }
+
+        public override Bounds GetBounds()
+        {
+            Bounds bounds = new Bounds(text.transform.position, new Vector3(text.rectTransform.rect.width, text.rectTransform.rect.height, 0.0f));
+            return bounds;
+        }
     }
 }

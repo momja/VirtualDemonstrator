@@ -189,6 +189,13 @@ namespace VirtualDemonstrator
             element.transform.SetParent(this.nonSelectionParent);
         }
 
+        public void DeleteSelectedElements(int index=-1) {
+            foreach(VisualElement element in selectedVisualElements_) {
+                DeleteElement(element, index);
+            }
+            ClearSelectedElements();
+        }
+
         /// Updates the states of all selected elements by calling
         /// element.UpdateState()
         public void UpdateSelectedElementStates() {
@@ -206,6 +213,31 @@ namespace VirtualDemonstrator
             this.selectedVisualElements_ = new HashSet<VisualElement>();
             this.selectionParent.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             this.selectionParent.localScale = Vector3.one;
+        }
+
+        public void CopySelectedForward() {
+            foreach(WorkspaceState state in GetStatesAfterCurrent()) {
+                foreach(VisualElement element in this.selectedVisualElements_) {
+                    state.AddState(element);
+                }
+            }
+        }
+
+        public void DuplicateSelected() {
+            HashSet<VisualElement> duplicates = new HashSet<VisualElement>();
+            foreach(VisualElement element in this.selectedVisualElements_) {
+                element.SelectExited();
+                element.transform.SetParent(this.nonSelectionParent);
+                GameObject duplicate = Instantiate(element.gameObject, element.transform.position + Vector3.one*0.1f, element.transform.rotation, nonSelectionParent);
+                VisualElement duplicateElement = duplicate.GetComponent<VisualElement>();
+                duplicates.Add(duplicateElement);
+                InsertNewElement(duplicateElement);
+            }
+            ClearSelectedElements();
+            foreach(VisualElement duplicate in duplicates) {
+                AddSelectedElement(duplicate);
+            }
+            UpdateSelectionParentPosition();
         }
 
         /// Adds a new state at the provided index. The default index (-1)

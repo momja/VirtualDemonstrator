@@ -19,12 +19,8 @@ namespace VirtualDemonstrator
     // This class handles the users actions while an object is selected by the right hand.
     public class BimanualTransformer : MonoBehaviour
     {
-<<<<<<< HEAD
-        void Start() {
-=======
         private void Start()
         {
->>>>>>> master
             this.rig = FindObjectOfType<XRRig>();
             this.xrInteractionManager = FindObjectOfType<XRInteractionManager>();
         }
@@ -32,6 +28,20 @@ namespace VirtualDemonstrator
         // Update is called once per frame
         private void Update()
         {
+            float prevTrigger = trigger;
+            dominantController.TryGetFeatureValue(CommonUsages.trigger, out trigger);
+            if (trigger >= 0.5 && prevTrigger < 0.5)
+            {
+                // if no intersection with visual element, remove all elements
+                if (dominantInteractor.selectTarget == null ||
+                    dominantInteractor.selectTarget.gameObject.layer != 11)
+                {
+                    // remove all selection
+                    Workspace.Instance.ClearSelectedElements();
+                    selecting = false;
+                    Workspace.Instance.DetachMenu();
+                }
+            }
             // Attempt to reconnect with the left controller if it disconnects.
             if (reconnecting)
             {
@@ -42,24 +52,15 @@ namespace VirtualDemonstrator
             // Get controller midpoint for scaling helper
             Vector3 ctrlMidpoint = ControllerMidpoint();
 
+            // Get dominant thumbstick
+            dominantController.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstick);
+
             // Get updated input from the "x" button on the Quest controller.
             bool prevRecessiveGripDown = recessiveGripDown;
             bool prevDominantGripDown = dominantGripDown;
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
             bool idle = (prevRecessiveGripDown || prevDominantGripDown) && (!recessiveGripDown && !dominantGripDown);
-
-            bool triggerDown;
-            dominantController.TryGetFeatureValue(CommonUsages.triggerButton, out triggerDown);
-            if (triggerDown) {
-                // if no intersection with visual element, remove all elements
-                if (dominantInteractor.selectTarget == null) {
-                    // remove all selection
-                    Workspace.Instance.ClearSelectedElements();
-                    selecting = false;
-                    Workspace.Instance.DetachMenu();
-                }
-            }
 
             Workspace.Instance.selectionParent.SetParent(null);
 
@@ -153,6 +154,10 @@ namespace VirtualDemonstrator
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
             if (selecting)
             {
+                if (Mathf.Abs(thumbstick.y) > 0.1) {
+                    // Move selected along direction of ray
+                    Workspace.Instance.selectionParent.transform.position += thumbstick.y * dominantInteractor.transform.forward * 0.02f;
+                }
                 if (action == TransformAction.TRANSLATION)
                 {
                     // Set selected object as child of dominant controller
@@ -241,7 +246,6 @@ namespace VirtualDemonstrator
             }
         }
 
-
         // This function attempts to connect the controllers if it disconnects.
         private void ConnectController()
         {
@@ -329,6 +333,10 @@ namespace VirtualDemonstrator
         public void ElementSelected()
         {
             GameObject selectedElement = dominantInteractor.selectTarget.gameObject;
+            if (selectedElement.layer != 11)
+            {
+                return;
+            }
             Workspace.Instance.selectionParent.SetParent(null);
             VisualElement selVisElem = selectedElement.GetComponent<VisualElement>();
             if (selVisElem == null)
@@ -374,6 +382,8 @@ namespace VirtualDemonstrator
         private Transform miniObject = null;
         private bool xButtonPrev = false;
         private bool recessiveGripDown = false;
+        private float trigger = 0f;
+        private Vector2 thumbstick;
         // This value is true when the left controller loses connection.
         private bool reconnecting = true;
 

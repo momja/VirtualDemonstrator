@@ -19,9 +19,12 @@ namespace VirtualDemonstrator {
 
         protected virtual void Start()
         {
+        } 
+
+        void Awake() {
             this.workspace = Workspace.Instance;
             this.outline = gameObject.GetComponent<Outline>();
-        } 
+        }
         
         public void UpdateState()
         {
