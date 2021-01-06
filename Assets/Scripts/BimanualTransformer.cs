@@ -60,7 +60,7 @@ namespace VirtualDemonstrator
             bool prevDominantGripDown = dominantGripDown;
             recessiveController.TryGetFeatureValue(CommonUsages.gripButton, out recessiveGripDown);
             dominantController.TryGetFeatureValue(CommonUsages.gripButton, out dominantGripDown);
-            bool idle = (prevRecessiveGripDown || prevDominantGripDown) && (!recessiveGripDown && !dominantGripDown);
+            bool idle = (prevRecessiveGripDown || prevDominantGripDown || Mathf.Abs(thumbstick.y) < 0.1) && (!recessiveGripDown && !dominantGripDown);
 
             Workspace.Instance.selectionParent.SetParent(null);
 

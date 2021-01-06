@@ -10,10 +10,9 @@ namespace VirtualDemonstrator
 
         public void InstantiateVisualElement()
         {
-            GameObject visualElement = Instantiate(visualElementPrefab, transform.position, transform.rotation);
-            menu_.AddElement(visualElement.GetComponent<VisualElement>());
+            GameObject visElObj = Instantiate(visualElementPrefab, transform.position, transform.rotation);
+            menu_.AddElement(visElObj.GetComponent<VisualElement>());
         }
-
         public MenuPanel menu_;
     }
 }

@@ -30,7 +30,7 @@ namespace VirtualDemonstrator {
         {
             VisualElementState state = this.workspace.GetCurrentState().elementStates[this];
             state.SetStatePosition(this.gameObject.transform.position);
-            state.SetStateScale(this.gameObject.transform.localScale);
+            state.SetStateScale(this.gameObject.transform.lossyScale);
             state.SetStateRotation(this.gameObject.transform.rotation);
             state.SetStateMaterial(this.gameObject.GetComponent<Renderer>().material);
         }
@@ -68,6 +68,12 @@ namespace VirtualDemonstrator {
             return GetComponent<Renderer>().bounds;
         }
 
+        public virtual void SetMesh(Mesh mesh) {
+           MeshFilter mf = GetComponent<MeshFilter>();
+           if (mf != null) {
+               mf.mesh = mesh;
+           }
+        }
 
         // This function returns the Element's GameObject.
         public GameObject GetElementObject() { return this.gameObject; }
