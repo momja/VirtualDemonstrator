@@ -255,8 +255,6 @@ namespace VirtualDemonstrator
             this._prevState = this._curState;
             this._curState = state;
             
-            // increment slider size
-            timeline.setStateCount(this.stateHistory_.Count);
 
             if (index < 0)
             {
@@ -267,17 +265,10 @@ namespace VirtualDemonstrator
             {
                 this.stateHistory_.Insert(index, state);
             }
-            print("Total States: " + this.stateHistory_.Count);
-        }
+            // increment slider size
+            timeline.setStateCount(this.stateHistory_.Count);
 
-        public bool DeleteState(WorkspaceState state)
-        {
-            bool result = this.stateHistory_.Remove(state);
-            if (result)
-            {
-                this.timeline.stateCount -= 1;
-            }
-            return result;
+            print("Total States: " + this.stateHistory_.Count);
         }
 
         public bool DeleteState(int index)
@@ -287,6 +278,17 @@ namespace VirtualDemonstrator
                 return false;
             }
             this.stateHistory_.RemoveAt(index);
+            if (index < this.stateIndex) {
+                this.stateIndex -= 1;
+            } else if (index == this.stateIndex) {
+                if (index > 0) {
+                    this.stateIndex -= 1;
+                }
+                this._curState = this.stateHistory_[stateIndex];
+                this.goalStateFrame = stateIndex;
+                this.startStateFrame = stateIndex;
+                this.UpdateCurrentState(1);
+            }
             return true;
         }
 

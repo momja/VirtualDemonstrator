@@ -32,7 +32,12 @@ public class WorkspaceStateMarkers : MonoBehaviour
     void CreateNewMarkers()
     {
         numStates = (int) slider.maxValue + 1;
-        distanceBetweenMarkers = panelLength / (numStates-1);
+        if (numStates > 1) {
+            distanceBetweenMarkers = panelLength / (numStates - 1);
+        }
+        else {
+            distanceBetweenMarkers = 0;
+        }
         panelDir = (panelEnd.position - panelStart.position).normalized;
         for (int i = 0; i < numStates; i++)
         {
@@ -42,7 +47,7 @@ public class WorkspaceStateMarkers : MonoBehaviour
         }
     }
 
-     public void ClearChildren(Transform parent)
+    public void ClearChildren(Transform parent)
     {
         int i = 0;
 
