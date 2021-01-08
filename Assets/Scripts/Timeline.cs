@@ -45,7 +45,7 @@ namespace VirtualDemonstrator {
             int t = (int)slider.slider.value;
             workspace.DeleteState(t);
             if (t > 0) {
-                this.slider.slider.SetValueWithoutNotify(t-1);
+                SetSlider(t-1);
             }
             this.setStateCount(stateCount-1);
         }
@@ -53,6 +53,10 @@ namespace VirtualDemonstrator {
         public void setStateCount(int count) {
             this.stateCount = count;
             this.slider.slider.maxValue = this.stateCount - 1;
+        }
+
+        public void SetSlider(int value) {
+            this.slider.slider.SetValueWithoutNotify(value);
         }
     }
 }

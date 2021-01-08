@@ -32,7 +32,8 @@ namespace VirtualDemonstrator {
             state.SetStatePosition(this.gameObject.transform.position);
             state.SetStateScale(this.gameObject.transform.lossyScale);
             state.SetStateRotation(this.gameObject.transform.rotation);
-            state.SetStateMaterial(this.gameObject.GetComponent<Renderer>().material);
+            Material mat = new Material(this.gameObject.GetComponent<Renderer>().material);
+            state.SetStateMaterial(mat);
         }
 
         public virtual void HoverEntered() {

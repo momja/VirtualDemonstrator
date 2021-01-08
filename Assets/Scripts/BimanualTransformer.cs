@@ -54,6 +54,14 @@ namespace VirtualDemonstrator
 
             // Get dominant thumbstick
             dominantController.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstick);
+            Vector2 thumbstick_rec;
+            recessiveController.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstick_rec);
+
+            if (thumbstick_rec.x > 0.3) {
+                Workspace.Instance.RequestNextSlide();
+            } else if (thumbstick_rec.x < -0.3) {
+                Workspace.Instance.ReqeuestPreviousSlide();
+            }
 
             // Get updated input from the "x" button on the Quest controller.
             bool prevRecessiveGripDown = recessiveGripDown;
@@ -109,7 +117,6 @@ namespace VirtualDemonstrator
             else if (recessiveGripDown && !prevRecessiveGripDown)
             {
                 // Rotation
-                Workspace.Instance.HideMenuAndTimeline(true);
                 if (miniObject != null)
                 {
                     GameObject.Destroy(miniObject.gameObject, 0);
@@ -138,7 +145,6 @@ namespace VirtualDemonstrator
             else if (idle)
             {
                 // Idle
-                Workspace.Instance.HideMenuAndTimeline(false);
                 if (miniObject != null)
                 {
                     GameObject.Destroy(miniObject.gameObject, 0);

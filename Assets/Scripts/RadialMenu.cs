@@ -23,6 +23,7 @@ namespace VirtualDemonstrator
         public float outerRadius = 0.2f;
         public Vector3 centerOffset = new Vector3(0, 0, 0);
         public Material optionMaterial;
+        public GameObject colorMenu;
 
         private void Start()
         {
@@ -54,6 +55,9 @@ namespace VirtualDemonstrator
         {
             attached = null;
             this.gameObject.SetActive(false);
+            if (this.colorMenu != null) {
+                this.colorMenu.GetComponent<RadialMenu>().Detach();
+            }
         }
 
         /// Certain elements will require different menu elements
@@ -76,6 +80,9 @@ namespace VirtualDemonstrator
                 newOption.GetComponent<MeshFilter>().mesh = mesh;
                 newOption.GetComponent<MeshCollider>().sharedMesh = mesh;
                 newOption.GetComponent<MenuOption>().SetInfo(option);
+                if (option.overrideMaterial != null) {
+                    newOption.GetComponent<Renderer>().material = option.overrideMaterial;
+                }
                 newOption.transform.GetComponentInChildren<TextMeshPro>().text = option.name;
                 newOption.transform.Rotate(Vector3.forward, ((float)MenuOptions.Count / 2 - (float)i) * degreesSpacing, Space.Self);
                 i += 1;
@@ -151,6 +158,11 @@ namespace VirtualDemonstrator
         public void HideMenu(bool hide)
         {
             this.gameObject.SetActive(!hide);
+        }
+
+        public void DisplayColors() {
+            colorMenu.GetComponent<RadialMenu>().Attach(this.attached);
+            gameObject.SetActive(false);
         }
     }
 }

@@ -80,6 +80,8 @@ namespace VirtualDemonstrator
                         this._prevState = this._curState;
                         this._curState = GetStateAtTime(this.stateIndex);
                         this.lerpT = 0.0f;
+                    } else {
+                        startStateFrame = goalStateFrame;
                     }
                 }
                 else if (this._curState != null)
@@ -93,6 +95,7 @@ namespace VirtualDemonstrator
             if (this.selectedVisualElements_.Count == 0) {
                 this.selectionParent.position = Vector3.zero;
                 this.selectionParent.rotation = Quaternion.identity;
+                this.radialMenu.Detach();
                 return;
             }
             foreach(VisualElement selElement in this.selectedVisualElements_) {
@@ -149,7 +152,7 @@ namespace VirtualDemonstrator
             this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
-            // refresh selection, remove any elements that arent in the current state
+            // refresh selection, remove any elements that aren't in the current state
             RefreshSelection();
         }
 
@@ -240,6 +243,15 @@ namespace VirtualDemonstrator
             UpdateSelectionParentPosition();
         }
 
+        public void SetColorSelected(Material mat) {
+            foreach(VisualElement element in this.selectedVisualElements_) {
+                // set the material for state & the gameobject
+                VisualElementState state = this._curState.elementStates[element];
+                state.SetStateMaterial(mat);
+                element.GetComponent<Renderer>().material.CopyPropertiesFromMaterial(mat);
+            }
+        }
+
         /// Adds a new state at the provided index. The default index (-1)
         /// will add a new state to the end of the state list.
         public void InsertNewState(int index = -1)
@@ -298,6 +310,38 @@ namespace VirtualDemonstrator
                 return null;
             }
             return this.stateHistory_[stateIndex];
+        }
+
+        public void RequestNextSlide() {
+            if (goalStateFrame != startStateFrame || this.stateIndex == this.stateHistory_.Count - 1) {
+                return;
+            }
+            int index = this.stateIndex + 1;
+            this._prevState = this._curState;
+            this.startStateFrame = this.stateIndex;
+            this.goalStateFrame = index;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this._curState = GetStateAtTime(stateIndex);
+            this.lerpT = 0;
+            // refresh selection, remove any elements that aren't in the current state
+            RefreshSelection();
+            timeline.SetSlider(index);
+        }
+
+        public void ReqeuestPreviousSlide() {
+            if (goalStateFrame != startStateFrame || this.stateIndex == 0) {
+                return;
+            }
+            int index = this.stateIndex - 1;
+            this._prevState = this._curState;
+            this.startStateFrame = this.stateIndex;
+            this.goalStateFrame = index;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this._curState = GetStateAtTime(stateIndex);
+            this.lerpT = 0;
+            // refresh selection, remove any elements that aren't in the current state
+            RefreshSelection();
+            timeline.SetSlider(index);
         }
 
         public void UpdateCurrentState(float t) {
