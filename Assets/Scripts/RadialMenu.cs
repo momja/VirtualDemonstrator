@@ -133,7 +133,7 @@ namespace VirtualDemonstrator
             lookPos.y = 0;
             var rotation = Quaternion.LookRotation(lookPos);
             transform.rotation = rotation;
-            transform.Rotate(Vector3.up, 10, Space.World);
+            transform.Rotate(Vector3.up, 20, Space.World);
             transform.Translate(Vector3.right * objectRadius + centerOffset, Space.Self);
         }
 
