@@ -19,7 +19,6 @@ namespace VirtualDemonstrator
             base.Start();
             this.keyboard = FindObjectOfType<VRKeys.Keyboard>();
             this.keyboard.OnSubmit.AddListener(text => DeactivateKeyboard());
-            this.OnSelect.AddListener(ActivateKeyboard);
             this.OnSelectExit.AddListener(DeactivateKeyboard);
             this.outline = this.text.GetComponent<Outline>();
         }

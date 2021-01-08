@@ -25,7 +25,7 @@ namespace VirtualDemonstrator
         public Material optionMaterial;
         public GameObject colorMenu;
 
-        private void Start()
+        protected virtual void Start()
         {
             RefreshMenu();
             HideMenu(true);
@@ -40,8 +40,16 @@ namespace VirtualDemonstrator
             }
         }
 
-        public void Attach(Transform element)
+        public void Attach(Transform element, Transform latestElement, bool showEdit=false)
         {
+            if (showEdit) {
+                MenuOptionInfo editOption = new MenuOptionInfo();
+                editOption.name = "Edit";
+                editOption.action = new UnityEvent();
+                editOption.action.AddListener(latestElement.GetComponent<TextElement>().ActivateKeyboard);
+                MenuOptions.Add(editOption);
+                RefreshMenu();
+            }
             if (CameraNode == null || CameraNode.characteristics == InputDeviceCharacteristics.None)
             {
                 this.CameraNode = XRExtenders.XRHelpers.GetCameraNode();
@@ -58,12 +66,20 @@ namespace VirtualDemonstrator
             if (this.colorMenu != null) {
                 this.colorMenu.GetComponent<RadialMenu>().Detach();
             }
+            if (MenuOptions.Count > 4) {
+                MenuOptions.RemoveAt(4);
+                RefreshMenu();
+            }
         }
 
         /// Certain elements will require different menu elements
         /// RefreshMenu can be called to re-generate the meshes
         private void RefreshMenu()
         {
+            Vector3 tempPos = transform.position;
+            Quaternion tempRot = transform.rotation;
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
             foreach (Transform child in transform)
             {
                 // remove all existing elements
@@ -87,6 +103,8 @@ namespace VirtualDemonstrator
                 newOption.transform.Rotate(Vector3.forward, ((float)MenuOptions.Count / 2 - (float)i) * degreesSpacing, Space.Self);
                 i += 1;
             }
+            transform.position = tempPos;
+            transform.rotation = tempRot;
         }
 
         private void UpdatePosition(Transform element)
@@ -115,7 +133,7 @@ namespace VirtualDemonstrator
             lookPos.y = 0;
             var rotation = Quaternion.LookRotation(lookPos);
             transform.rotation = rotation;
-            transform.Rotate(Vector3.up, 15, Space.World);
+            transform.Rotate(Vector3.up, 10, Space.World);
             transform.Translate(Vector3.right * objectRadius + centerOffset, Space.Self);
         }
 
@@ -161,7 +179,7 @@ namespace VirtualDemonstrator
         }
 
         public void DisplayColors() {
-            colorMenu.GetComponent<RadialMenu>().Attach(this.attached);
+            colorMenu.GetComponent<RadialMenu>().Attach(this.attached, this.attached, false);
             gameObject.SetActive(false);
         }
     }

@@ -90,27 +90,25 @@ namespace VirtualDemonstrator
                 if (!scalingDown)
                 {
                     scalingDown = true;
-                    scalingX = false;
-                    scalingY = false;
-                    scalingZ = false;
-
+                    
                     // get the current distance between the controllers to act as the "0-value".
                     Vector3 positionDifference = recessiveControllerObject.transform.InverseTransformPoint(dominantControllerObject.transform.position);
                     startingDistance = positionDifference.magnitude;
 
                     // Determine which axis to start scaling based on the xyz distances of the controllers.
                     float maxAxis = Mathf.Max(Mathf.Abs(positionDifference.x), Mathf.Max(Mathf.Abs(positionDifference.y), positionDifference.z));
+                    scalingAxis = Vector3.zero;
                     if (maxAxis == Mathf.Abs(positionDifference.x))
                     {
-                        scalingX = true;
+                        scalingAxis.x = 1;
                     }
                     else if (maxAxis == Mathf.Abs(positionDifference.y))
                     {
-                        scalingY = true;
+                        scalingAxis.y = 1;
                     }
                     else
                     {
-                        scalingZ = true;
+                        scalingAxis.z = 1;
                     }
                 }
             }
@@ -196,33 +194,16 @@ namespace VirtualDemonstrator
 
                     // Determine what axis to apply the change to.
                     Vector3 scalingFactor = new Vector3();
-                    if (scalingX)
-                    {
-                        scalingFactor.x = scaleValue * 30;
-                    }
-                    else if (scalingY)
-                    {
-                        scalingFactor.y = scaleValue * 30;
-                    }
-                    else
-                    {
-                        scalingFactor.z = scaleValue * 30;
+                    if (Workspace.Instance.selVisualElements.Count > 1) {
+                        // Uniform scaling in the case that multiple objects are selected
+                        scalingFactor = Vector3.one * scaleValue * 20;
+                    } else {
+                        scalingFactor = scalingAxis * scaleValue * 20;
                     }
 
                     // Clamp the scale to non-negative values.
                     Vector3 frameContribution = scalingElement + scalingFactor;
-                    if (frameContribution.x < 0)
-                    {
-                        frameContribution.x = 0;
-                    }
-                    if (frameContribution.y < 0)
-                    {
-                        frameContribution.y = 0;
-                    }
-                    if (frameContribution.z < 0)
-                    {
-                        frameContribution.z = 0;
-                    }
+                    frameContribution = ClipVec(frameContribution);
 
                     // Apply the scale contribution.
                     Workspace.Instance.selectionParent.localScale = frameContribution;
@@ -396,8 +377,6 @@ namespace VirtualDemonstrator
         // Values needed for David's scaling technique.
         private float startingDistance;
         private bool scalingDown = true;
-        private bool scalingX = false;
-        private bool scalingY = false;
-        private bool scalingZ = false;
+        private Vector3 scalingAxis = new Vector3(0,0,0);
     }
 }

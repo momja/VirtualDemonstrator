@@ -376,7 +376,8 @@ namespace VirtualDemonstrator
         }
 
         public void AttachMenu(VisualElement element) {
-            radialMenu.Attach(selectionParent);
+            bool showEdit = element.GetType().Equals(typeof(TextElement));
+            radialMenu.Attach(selectionParent, element.transform, showEdit);
         }
 
         public void DetachMenu() {
