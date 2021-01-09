@@ -3189,7 +3189,7 @@ PrefabInstance:
         type: 3}
       propertyPath: visualElementPrefab
       value: 
-      objectReference: {fileID: 6637368180459502104, guid: ba55de6b9918d5f4f9a51151167daf35,
+      objectReference: {fileID: 2766763877822447130, guid: 1e1f4f6b660f43045b040e5c66bbf4e1,
         type: 3}
     - target: {fileID: 3124784250294988336, guid: bb40c013668350640bd1972975dc6b83,
         type: 3}
