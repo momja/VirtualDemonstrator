@@ -72,7 +72,11 @@ namespace VirtualDemonstrator
                 this.colorMenu.GetComponent<RadialMenu>().Detach();
             }
             if (MenuOptions.Count > 4) {
+<<<<<<< HEAD
                 MenuOptions.RemoveRange(4, MenuOptions.Count-4);
+=======
+                MenuOptions.RemoveRange(4,MenuOptions.Count-4);
+>>>>>>> demo
                 RefreshMenu();
             }
         }
