@@ -13,6 +13,7 @@ namespace VirtualDemonstrator {
         public Outline outline;
         public Color hoverColor = new Color(0.902f,0.945f,0.0706f);
         public Color selectColor = new Color(0.109f,0.925f,0.270f);
+        public GameObject selectionIndicator;
 
         private void Start() {
             this.outline = GetComponent<Outline>();
@@ -26,23 +27,28 @@ namespace VirtualDemonstrator {
         }
 
         public void HoverEntered() {
-            outline.enabled = true;
-            outline.OutlineColor = hoverColor;
+            selectionIndicator.SetActive(true);
+            selectionIndicator.transform.SetParent(transform);
+            selectionIndicator.transform.localPosition = new Vector3(0.7f,0,0);
+            //outline.enabled = true;
+            //outline.OutlineColor = hoverColor;
         }
 
         public void HoverExited() {
-            outline.enabled = false;
+            selectionIndicator.SetActive(false);
+            selectionIndicator.transform.SetParent(null);
+            // outline.enabled = false;
         }
 
         public void SelectEntered() {
             if (this.info.action != null) {
                 this.info.action.Invoke();
             }
-            outline.OutlineColor = selectColor;
+            //outline.OutlineColor = selectColor;
         }
 
         public void SelectExited() {
-            outline.OutlineColor = hoverColor;
+            //outline.OutlineColor = hoverColor;
         }
     }
 }

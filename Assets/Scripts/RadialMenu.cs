@@ -17,6 +17,7 @@ namespace VirtualDemonstrator
         public List<MenuOptionInfo> MenuOptions;
         public GameObject defaultOptionObject;
 
+        public GameObject selectionIndicator;
         public float degreesPerOption = 10f;
         public float degreesSpacing = 11f;
         public float innerRadius = 0.05f;
@@ -29,6 +30,10 @@ namespace VirtualDemonstrator
         {
             RefreshMenu();
             HideMenu(true);
+            if (selectionIndicator == null) {
+                this.selectionIndicator = GameObject.Find("SelectionIndicator");
+            }
+            this.selectionIndicator.SetActive(false);
         }
 
         private void Update()
@@ -95,7 +100,9 @@ namespace VirtualDemonstrator
                 newOption.GetComponent<MeshRenderer>().material = optionMaterial;
                 newOption.GetComponent<MeshFilter>().mesh = mesh;
                 newOption.GetComponent<MeshCollider>().sharedMesh = mesh;
-                newOption.GetComponent<MenuOption>().SetInfo(option);
+                MenuOption newMenuOption = newOption.GetComponent<MenuOption>();
+                newMenuOption.SetInfo(option);
+                newMenuOption.selectionIndicator = selectionIndicator;
                 if (option.overrideMaterial != null) {
                     newOption.GetComponent<Renderer>().material = option.overrideMaterial;
                 }
