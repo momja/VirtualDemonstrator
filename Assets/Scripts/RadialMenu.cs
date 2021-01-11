@@ -11,9 +11,9 @@ namespace VirtualDemonstrator
 {
     public class RadialMenu : MonoBehaviour
     {
-        private List<GameObject> MenuOptionObjects = new List<GameObject>();
-        private InputDevice CameraNode;
-        private Transform attached;
+        protected List<GameObject> MenuOptionObjects = new List<GameObject>();
+        protected InputDevice CameraNode;
+        protected Transform attached;
         public List<MenuOptionInfo> MenuOptions;
         public GameObject defaultOptionObject;
 
@@ -45,9 +45,9 @@ namespace VirtualDemonstrator
             }
         }
 
-        public void Attach(Transform element, Transform latestElement, bool showEdit=false)
+        public virtual void Attach(Transform element, Transform latestElement, bool showEdit=false)
         {
-            if (showEdit) {
+            if (showEdit && this.MenuOptions.Count < 5) {
                 MenuOptionInfo editOption = new MenuOptionInfo();
                 editOption.name = "Edit";
                 editOption.action = new UnityEvent();
@@ -64,7 +64,7 @@ namespace VirtualDemonstrator
             attached = element;
         }
 
-        public void Detach()
+        public virtual void Detach()
         {
             attached = null;
             this.gameObject.SetActive(false);
@@ -79,7 +79,7 @@ namespace VirtualDemonstrator
 
         /// Certain elements will require different menu elements
         /// RefreshMenu can be called to re-generate the meshes
-        private void RefreshMenu()
+        protected void RefreshMenu()
         {
             Vector3 tempPos = transform.position;
             Quaternion tempRot = transform.rotation;
@@ -114,7 +114,7 @@ namespace VirtualDemonstrator
             transform.rotation = tempRot;
         }
 
-        private void UpdatePosition(Transform element)
+        protected void UpdatePosition(Transform element)
         {
             Vector3 cameraPosition;
             CameraNode.TryGetFeatureValue(CommonUsages.centerEyePosition, out cameraPosition);
@@ -145,12 +145,13 @@ namespace VirtualDemonstrator
         }
 
         /// Generates a mesh for option given the current option cound
-        private Mesh GenerateMesh()
+        protected Mesh GenerateMesh()
         {
             Mesh mesh = new Mesh();
 
             List<Vector3> newVertices = new List<Vector3>();
             List<int> newTriangles = new List<int>();
+            List<Vector2> uvVerts = new List<Vector2>();
 
             float degrees = degreesPerOption / 2f;
 
@@ -166,9 +167,15 @@ namespace VirtualDemonstrator
             newTriangles.Add(0);
             newTriangles.Add(2);
 
+            uvVerts.Add(new Vector2(0,0));
+            uvVerts.Add(new Vector2(0,1));
+            uvVerts.Add(new Vector2(1,1));
+            uvVerts.Add(new Vector2(1,0));
+
             mesh.Clear();
             mesh.vertices = newVertices.ToArray();
             mesh.triangles = newTriangles.ToArray();
+            mesh.uv = uvVerts.ToArray();
             mesh.Optimize();
             mesh.RecalculateNormals();
 
