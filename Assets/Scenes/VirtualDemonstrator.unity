@@ -5961,6 +5961,46 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360439004021211082, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5615605704051686618, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6207,6 +6247,12 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 417f0a941ca9f4d4a97dbd75b642b0d2, type: 2}
+    - target: {fileID: 9064551202156064879, guid: dd5e7e8e3b5ce02489cf97fe97634fbd,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -2432090755550338912, guid: fe1ad5cdc4b0171479a636c5ae9412ac,
+        type: 3}
     m_RemovedComponents:
     - {fileID: 8792993306076506994, guid: dd5e7e8e3b5ce02489cf97fe97634fbd, type: 3}
     - {fileID: 8792993306076506995, guid: dd5e7e8e3b5ce02489cf97fe97634fbd, type: 3}
