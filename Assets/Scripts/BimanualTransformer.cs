@@ -111,6 +111,8 @@ namespace VirtualDemonstrator
                         scalingAxis.z = 1;
                     }
                 }
+                
+                Workspace.Instance.HideMenuAndTimeline(true);
             }
             else if (recessiveGripDown && !prevRecessiveGripDown)
             {
@@ -126,6 +128,7 @@ namespace VirtualDemonstrator
                 action = TransformAction.ROTATION;
 
                 scalingDown = false;
+                Workspace.Instance.HideMenuAndTimeline(true);
             }
             else if (dominantGripDown && !prevDominantGripDown)
             {
@@ -139,6 +142,7 @@ namespace VirtualDemonstrator
                 action = TransformAction.TRANSLATION;
 
                 scalingDown = false;
+                Workspace.Instance.HideMenuAndTimeline(false);
             }
             else if (idle)
             {
@@ -153,6 +157,7 @@ namespace VirtualDemonstrator
                 action = TransformAction.IDLE;
 
                 scalingDown = false;
+                Workspace.Instance.HideMenuAndTimeline(false);
             }
 
             // If a selection is in progress, manage the user's transformations using bimanual techniques.
