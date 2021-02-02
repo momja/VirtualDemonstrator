@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.EventSystems;
+using UnityEditor;
+using Newtonsoft.Json;
 
 namespace VirtualDemonstrator
 {
@@ -138,6 +140,16 @@ namespace VirtualDemonstrator
             }
             this.UpdateSelectionParentPosition();
             this.selectedVisualElements_ = newSelection;
+        }
+
+        /// Saves workspace as a json file
+        [MenuItem("Tools/Save Workspace")]
+        static public void SaveWorkspace() {
+            JsonSerializerSettings settings = new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.All
+            };
+            string output = JsonConvert.SerializeObject(Workspace.Instance.stateHistory_, Formatting.Indented);
+            print(output);
         }
 
         public void OnTimelineChanged(int index)

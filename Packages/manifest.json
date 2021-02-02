@@ -13,6 +13,7 @@
     "com.unity.xr.interaction.toolkit": "0.10.0-preview.7",
     "com.unity.xr.management": "3.2.17",
     "com.unity.xr.oculus": "1.6.1",
+    "jillejr.newtonsoft.json-for-unity": "https://github.com/jilleJr/Newtonsoft.Json-for-Unity.git#upm",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
