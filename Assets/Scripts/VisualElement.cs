@@ -6,6 +6,7 @@ using UnityEngine.Events;
 namespace VirtualDemonstrator {
     public class VisualElement : MonoBehaviour {
 
+        public string prefabPath = 'VisualElement/'
         public Color hoverColor = new Color(0.902f,0.945f,0.0706f);
         public Color selectColor = new Color(0.109f,0.925f,0.270f);
         public UnityEvent OnHover = new UnityEvent();

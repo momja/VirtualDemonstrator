@@ -169,6 +169,81 @@ namespace VirtualDemonstrator
             this.selectedVisualElements_ = newSelection;
         }
 
+        /// Parse a JSON file into Workspace states
+        static public void LoadWorkspace(string filename) {
+            JObject json = JObject.Parse(File.ReadAllText(filename));
+            JObject elements = (JObject)json["Elements"];
+
+            Dictionary<string, UnityEngine.Object> id_elements = new Dictionary<string,VisualElement>();
+
+            foreach (JProperty p in elements.Properties())
+            {
+                string name = p.Name;
+                string value = (string)p.Value;
+                UnityEngine.Object prefab = Resources.Load($"VisualElements/{value}");
+                // FIXME: without renaming object, there could potentially be repeats
+                // because the UID does not hold for this new workspace
+                GameObject visElObj = Instantiate(prefab)
+                element__prefabs.add(name, visElObj);
+                Instance.InsertNewElement(visElObj.GetComponent<VisualElement>());
+            }
+
+            JArray states = (JArray)json["States"];
+
+            int index = 0;
+            // WorkspaceStates (arrays)
+            foreach (JArray a in states.Children<JArray>()) {
+                Instance.InsertNewState(index);
+                WorkspaceState WSState = Instance.GetStateAtTime(index);
+                // VisualElementStates (arrays)
+                foreach (JObject o in o.Children<JObject>()) {
+                    // VisualElements (objects)
+                    List<JProperty> properties = o.Properties();
+
+                    // name
+                    string name = properties[0].Children<string>();
+                    VisualElement element = id_elements[name];
+
+                    // position
+                    Vector3 position = Vector3.zero;
+                    List<float> values_pos = properties[1].Children<float>();
+                    position.x = values_pos[0];
+                    position.y = values_pos[1];
+                    position.z = values_pos[2];
+
+                    // scale
+                    Vector3 scale = Vector3.zero;
+                    List<float> values_sc = properties[2].Children<float>();
+                    scale.x = values_sc[0];
+                    scale.y = values_sc[1];
+                    scale.z = values_sc[2];
+
+                    // rotation
+                    Quaternion rotation = Quaternion.identity;
+                    List<float> values_rot = properties[3].Children<float>();
+                    rotation.x = values_rot[0];
+                    rotation.y = values_rot[1];
+                    rotation.z = values_rot[2];
+                    rotation.w = values_rot[3];
+
+                    // material
+                    Material material;
+                    string material_name = (string)properties[4];
+                    material = Resources.Load<Material>($"Materials/{material_name}");
+
+                    // create new state
+                    WSState.AddState(element);
+                    // populate new state variables
+                    VisualElementState VEState = WSState.elementStates[element];
+                    VEState.position = position;
+                    VEState.scale = scale;
+                    VEState.rotation = rotation;
+                    VEState.material = material;
+                }
+                index++;
+            }
+        }
+
         /// Saves workspace as a json file
         [MenuItem("Tools/Save Workspace")]
         static public void SaveWorkspace()
@@ -189,7 +264,7 @@ namespace VirtualDemonstrator
                 writer.WriteStartObject();
                 foreach (KeyValuePair<VisualElement, UnityEngine.Object> pair in Instance.allElements) {
                     writer.WritePropertyName(pair.Key.gameObject.name);
-                    writer.WriteValue(AssetDatabase.GetAssetPath(pair.Value));
+                    writer.WriteValue(pair.Key.prefabPath);
                 }
                 writer.WriteEndObject();
 
