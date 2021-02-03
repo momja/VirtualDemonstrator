@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82b0f6714d6ff945afd07c9333e2a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabPath: Default VisualElement
   hoverColor: {r: 0.902, g: 0.945, b: 0.0706, a: 1}
   selectColor: {r: 0.109, g: 0.925, b: 0.27, a: 1}
   OnHover:

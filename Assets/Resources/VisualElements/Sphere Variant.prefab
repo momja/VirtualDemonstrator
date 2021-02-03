@@ -20,10 +20,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -4073236949252725841, guid: f56a30f46cb282f48bd39cd9769a7e71,
+        type: 3}
+      propertyPath: prefabPath
+      value: Sphere Variant
+      objectReference: {fileID: 0}
     - target: {fileID: 6407383385532125618, guid: f56a30f46cb282f48bd39cd9769a7e71,
         type: 3}
       propertyPath: m_Name
-      value: Sphere
+      value: Sphere Variant
       objectReference: {fileID: 0}
     - target: {fileID: 6407383385532125621, guid: f56a30f46cb282f48bd39cd9769a7e71,
         type: 3}

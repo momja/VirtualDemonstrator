@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.EventSystems;
 using UnityEditor;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VirtualDemonstrator
 {
@@ -170,25 +172,33 @@ namespace VirtualDemonstrator
         }
 
         /// Parse a JSON file into Workspace states
-        static public void LoadWorkspace(string filename) {
+        [MenuItem("Tools/Load Workspace")]
+        static public void LoadWorkspace() {
+            string filename = "./workspace_save.json";
             JObject json = JObject.Parse(File.ReadAllText(filename));
             JObject elements = (JObject)json["Elements"];
 
-            Dictionary<string, UnityEngine.Object> id_elements = new Dictionary<string,VisualElement>();
+            Dictionary<string, VisualElement> id_elements = new Dictionary<string, VisualElement>();
 
             foreach (JProperty p in elements.Properties())
             {
                 string name = p.Name;
                 string value = (string)p.Value;
-                UnityEngine.Object prefab = Resources.Load($"VisualElements/{value}");
+                GameObject prefab = Resources.Load<GameObject>($"VisualElements/{value}");
                 // FIXME: without renaming object, there could potentially be repeats
                 // because the UID does not hold for this new workspace
-                GameObject visElObj = Instantiate(prefab)
-                element__prefabs.add(name, visElObj);
-                Instance.InsertNewElement(visElObj.GetComponent<VisualElement>());
+                GameObject visElObj = Instantiate(prefab);
+                visElObj.name = name;
+                visElObj.transform.localScale = Vector3.zero;
+                VisualElement visEl = visElObj.GetComponent<VisualElement>();
+                id_elements.Add(name, visEl);
+                Instance.allElements.Add(visEl, prefab);
             }
 
             JArray states = (JArray)json["States"];
+
+            Instance.stateHistory_ = new List<WorkspaceState>();
+            Instance._curState = null;
 
             int index = 0;
             // WorkspaceStates (arrays)
@@ -196,52 +206,57 @@ namespace VirtualDemonstrator
                 Instance.InsertNewState(index);
                 WorkspaceState WSState = Instance.GetStateAtTime(index);
                 // VisualElementStates (arrays)
-                foreach (JObject o in o.Children<JObject>()) {
+                foreach (JObject o in a.Children<JObject>()) {
                     // VisualElements (objects)
-                    List<JProperty> properties = o.Properties();
+                    List<JProperty> properties = o.Properties().ToList<JProperty>();
 
                     // name
-                    string name = properties[0].Children<string>();
+                    string name = (string)properties[0].Value;
                     VisualElement element = id_elements[name];
 
                     // position
                     Vector3 position = Vector3.zero;
-                    List<float> values_pos = properties[1].Children<float>();
-                    position.x = values_pos[0];
-                    position.y = values_pos[1];
-                    position.z = values_pos[2];
+                    string[] values_pos = ((string)properties[1].Value).Split(' ');
+                    position.x = float.Parse(values_pos[0]);
+                    position.y = float.Parse(values_pos[1]);
+                    position.z = float.Parse(values_pos[2]);
 
                     // scale
                     Vector3 scale = Vector3.zero;
-                    List<float> values_sc = properties[2].Children<float>();
-                    scale.x = values_sc[0];
-                    scale.y = values_sc[1];
-                    scale.z = values_sc[2];
+                    string[] values_sc = ((string)properties[2].Value).Split(' ');
+                    scale.x = float.Parse(values_sc[0]);
+                    scale.y = float.Parse(values_sc[1]);
+                    scale.z = float.Parse(values_sc[2]);
 
                     // rotation
                     Quaternion rotation = Quaternion.identity;
-                    List<float> values_rot = properties[3].Children<float>();
-                    rotation.x = values_rot[0];
-                    rotation.y = values_rot[1];
-                    rotation.z = values_rot[2];
-                    rotation.w = values_rot[3];
+                    string[] values_rot = ((string)properties[3].Value).Split(' ');
+                    rotation.x = float.Parse(values_rot[0]);
+                    rotation.y = float.Parse(values_rot[1]);
+                    rotation.z = float.Parse(values_rot[2]);
+                    rotation.w = float.Parse(values_rot[3]);
 
                     // material
                     Material material;
-                    string material_name = (string)properties[4];
+                    string material_name = (string)properties[4].Value;
                     material = Resources.Load<Material>($"Materials/{material_name}");
 
                     // create new state
                     WSState.AddState(element);
                     // populate new state variables
                     VisualElementState VEState = WSState.elementStates[element];
-                    VEState.position = position;
-                    VEState.scale = scale;
-                    VEState.rotation = rotation;
-                    VEState.material = material;
+                    VEState.SetStatePosition(position);
+                    VEState.SetStateScale(scale);
+                    VEState.SetStateRotation(rotation);
+                    VEState.SetStateMaterial(material);
                 }
                 index++;
             }
+            Instance.timeline.setStateCount(index);
+            Instance.timeline.UpdateMarkers();
+            Instance._curState = Instance.GetStateAtTime(0);
+            Instance.stateIndex = 0;
+            Instance.UpdateCurrentState(1);
         }
 
         /// Saves workspace as a json file
@@ -255,10 +270,11 @@ namespace VirtualDemonstrator
 
             StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
+
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 writer.Formatting = Formatting.Indented;
-                //writer.WriteStartObject();
+                writer.WriteStartObject();
 
                 writer.WritePropertyName("Elements");
                 writer.WriteStartObject();
@@ -285,22 +301,22 @@ namespace VirtualDemonstrator
                         // Position
                         var position = vizState.GetStatePosition();
                         writer.WritePropertyName("Position");
-                        writer.WriteValue($"[{position.x}, {position.y}, {position.z}]");
+                        writer.WriteValue($"{position.x} {position.y} {position.z}");
 
                         // Scale
                         var scale = vizState.GetStateScale();
                         writer.WritePropertyName("Scale");
-                        writer.WriteValue($"[{scale.x}, {scale.y}, {scale.z}]");
+                        writer.WriteValue($"{scale.x} {scale.y} {scale.z}");
 
                         // Rotation
                         var rotation = vizState.GetStateRotation();
                         writer.WritePropertyName("Rotation");
-                        writer.WriteValue($"[{rotation.x}, {rotation.y}, {rotation.z}, {rotation.w}]");
+                        writer.WriteValue($"{rotation.x} {rotation.y} {rotation.z} {rotation.w}");
 
                         // Color
                         var color = vizState.GetStateMaterial();
                         writer.WritePropertyName("Material");
-                        writer.WriteValue(color.name); // material name to access in resources
+                        writer.WriteValue(color.name.Replace(" (Instance)", "")); // material name to access in resources
 
                         // TODO: checking for child count to get text elements is total hack
                         if (vizState.GetStateElement().transform.childCount > 0) {
@@ -315,8 +331,9 @@ namespace VirtualDemonstrator
                     writer.WriteEndArray();
                 }
                 writer.WriteEndArray();
-                //writer.WriteEndObject();
+                writer.WriteEndObject();
             }
+            File.WriteAllText("./workspace_save.json", sb.ToString());
         }
 
         public void OnTimelineChanged(int index)

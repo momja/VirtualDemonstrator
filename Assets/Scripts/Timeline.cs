@@ -58,5 +58,9 @@ namespace VirtualDemonstrator {
         public void SetSlider(int value) {
             this.slider.slider.SetValueWithoutNotify(value);
         }
+
+        public void UpdateMarkers() {
+            transform.Find("Timeline Panel").GetComponent<WorkspaceStateMarkers>().UpdateMarkers();
+        }
     }
 }
