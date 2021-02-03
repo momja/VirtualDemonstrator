@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +13,8 @@ using Newtonsoft.Json;
 namespace VirtualDemonstrator
 {
 
-    public enum InteractionModes {
+    public enum InteractionModes
+    {
         Create,
         Present
     }
@@ -27,11 +31,14 @@ namespace VirtualDemonstrator
         public MenuPanel menuPanel;
         public Timeline timeline;
         public RadialMenu radialMenu;
-        public HashSet<VisualElement> selVisualElements {
-            get {
+        public HashSet<VisualElement> selVisualElements
+        {
+            get
+            {
                 return selectedVisualElements_;
             }
         }
+        public Dictionary<VisualElement, UnityEngine.Object> allElements;
         public WorkspaceBounds workspaceBounds;
         public GameObject rayInteractor;
         public Transform selectionParent;
@@ -52,6 +59,7 @@ namespace VirtualDemonstrator
         {
             this.stateHistory_ = new List<WorkspaceState>();
             this.selectedVisualElements_ = new HashSet<VisualElement>();
+            this.allElements = new Dictionary<VisualElement, UnityEngine.Object>();
             this.selectionParent = GameObject.Find("SelectionParent").transform;
             this.nonSelectionParent = null;
             this.timeline.workspace = this;
@@ -60,10 +68,14 @@ namespace VirtualDemonstrator
             InsertNewState();
         }
 
-        private void Awake() {
-            if (_instance != null && _instance != this) {
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
                 Destroy(this.gameObject);
-            } else {
+            }
+            else
+            {
                 _instance = this;
             }
         }
@@ -77,12 +89,15 @@ namespace VirtualDemonstrator
                 float t = Easings.easeInOut(this.lerpT);
                 if (this.lerpT > 1)
                 {
-                    if (this.stateIndex != goalStateFrame) {
-                        this.stateIndex = stateIndex + (int)Mathf.Sign(goalStateFrame-stateIndex)*1;
+                    if (this.stateIndex != goalStateFrame)
+                    {
+                        this.stateIndex = stateIndex + (int)Mathf.Sign(goalStateFrame - stateIndex) * 1;
                         this._prevState = this._curState;
                         this._curState = GetStateAtTime(this.stateIndex);
                         this.lerpT = 0.0f;
-                    } else {
+                    }
+                    else
+                    {
                         startStateFrame = goalStateFrame;
                     }
                 }
@@ -93,14 +108,17 @@ namespace VirtualDemonstrator
             }
         }
 
-        private void UpdateSelectionParentPosition() {
-            if (this.selectedVisualElements_.Count == 0) {
+        private void UpdateSelectionParentPosition()
+        {
+            if (this.selectedVisualElements_.Count == 0)
+            {
                 this.selectionParent.position = Vector3.zero;
                 this.selectionParent.rotation = Quaternion.identity;
                 this.radialMenu.Detach();
                 return;
             }
-            foreach(VisualElement selElement in this.selectedVisualElements_) {
+            foreach (VisualElement selElement in this.selectedVisualElements_)
+            {
                 // temporarily reset parent
                 selElement.transform.SetParent(null);
             }
@@ -109,12 +127,16 @@ namespace VirtualDemonstrator
             Vector3 positionMidPt = Vector3.zero;
             Quaternion rotationMidPt = Quaternion.identity;
             int i = 0;
-            foreach(VisualElement selElement in this.selectedVisualElements_) {
+            foreach (VisualElement selElement in this.selectedVisualElements_)
+            {
                 positionMidPt += selElement.transform.position;
-                if (i == 0) {
+                if (i == 0)
+                {
                     rotationMidPt = selElement.transform.rotation;
-                } else {
-                    float weight = 1.0f / (float)(i+1);
+                }
+                else
+                {
+                    float weight = 1.0f / (float)(i + 1);
                     rotationMidPt = Quaternion.Slerp(rotationMidPt, selElement.transform.rotation, weight);
                 }
                 i += 1;
@@ -122,18 +144,23 @@ namespace VirtualDemonstrator
             positionMidPt = positionMidPt / this.selectedVisualElements_.Count;
             this.selectionParent.position = positionMidPt;
             this.selectionParent.rotation = rotationMidPt;
-            foreach(VisualElement selElement in this.selectedVisualElements_) {
+            foreach (VisualElement selElement in this.selectedVisualElements_)
+            {
                 selElement.transform.SetParent(this.selectionParent);
             }
         }
 
-        private void RefreshSelection() {
+        private void RefreshSelection()
+        {
             HashSet<VisualElement> newSelection = new HashSet<VisualElement>();
-            foreach(VisualElement element in this.selectedVisualElements_) {
-                if (this._curState.ElementExists(element)) {
+            foreach (VisualElement element in this.selectedVisualElements_)
+            {
+                if (this._curState.ElementExists(element))
+                {
                     newSelection.Add(element);
                 }
-                else {
+                else
+                {
                     element.SelectExited();
                     element.transform.SetParent(this.nonSelectionParent);
                 }
@@ -144,41 +171,112 @@ namespace VirtualDemonstrator
 
         /// Saves workspace as a json file
         [MenuItem("Tools/Save Workspace")]
-        static public void SaveWorkspace() {
-            JsonSerializerSettings settings = new JsonSerializerSettings {
+        static public void SaveWorkspace()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
                 TypeNameHandling = TypeNameHandling.All
             };
-            string output = JsonConvert.SerializeObject(Workspace.Instance.stateHistory_, Formatting.Indented);
-            print(output);
+
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.Indented;
+                //writer.WriteStartObject();
+
+                writer.WritePropertyName("Elements");
+                writer.WriteStartObject();
+                foreach (KeyValuePair<VisualElement, UnityEngine.Object> pair in Instance.allElements) {
+                    writer.WritePropertyName(pair.Key.gameObject.name);
+                    writer.WriteValue(AssetDatabase.GetAssetPath(pair.Value));
+                }
+                writer.WriteEndObject();
+
+                writer.WritePropertyName("States");
+                writer.WriteStartArray();
+                foreach (WorkspaceState state in Instance.stateHistory_)
+                {
+                    writer.WriteStartArray();
+                    foreach (VisualElementState vizState in state.elementStates.Values)
+                    {
+                        writer.WriteStartObject();
+                        
+                        // Name
+                        var name = vizState.GetStateElement().name;
+                        writer.WritePropertyName("ElementName");
+                        writer.WriteValue(name);
+
+                        // Position
+                        var position = vizState.GetStatePosition();
+                        writer.WritePropertyName("Position");
+                        writer.WriteValue($"[{position.x}, {position.y}, {position.z}]");
+
+                        // Scale
+                        var scale = vizState.GetStateScale();
+                        writer.WritePropertyName("Scale");
+                        writer.WriteValue($"[{scale.x}, {scale.y}, {scale.z}]");
+
+                        // Rotation
+                        var rotation = vizState.GetStateRotation();
+                        writer.WritePropertyName("Rotation");
+                        writer.WriteValue($"[{rotation.x}, {rotation.y}, {rotation.z}, {rotation.w}]");
+
+                        // Color
+                        var color = vizState.GetStateMaterial();
+                        writer.WritePropertyName("Material");
+                        writer.WriteValue(color.name); // material name to access in resources
+
+                        // TODO: checking for child count to get text elements is total hack
+                        if (vizState.GetStateElement().transform.childCount > 0) {
+                            // Text element
+                            var textElement = (TextElement)vizState.GetStateElement();
+                            writer.WritePropertyName("Text");
+                            writer.WriteValue(textElement.text.text);
+                        }
+
+                        writer.WriteEndObject();
+                    }
+                    writer.WriteEndArray();
+                }
+                writer.WriteEndArray();
+                //writer.WriteEndObject();
+            }
         }
 
         public void OnTimelineChanged(int index)
         {
             Debug.Log(index);
-            if (index == stateIndex) {
+            if (index == stateIndex)
+            {
                 return;
             }
             this._prevState = this._curState;
             this.startStateFrame = this.stateIndex;
             this.goalStateFrame = index;
-            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index - stateIndex) * 1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
             // refresh selection, remove any elements that aren't in the current state
             RefreshSelection();
         }
 
-        public void InsertNewElement(VisualElement element) {
+        public void InsertNewElement(VisualElement element, UnityEngine.Object prefab)
+        {
             this._curState.AddState(element);
-            for (int i = this.stateIndex; i < this.stateHistory_.Count; i++) {
+            for (int i = this.stateIndex; i < this.stateHistory_.Count; i++)
+            {
                 this.stateHistory_[i].AddState(element);
             }
+            this.allElements.Add(element, prefab);
         }
 
         /// Removes element from the current and following frames by updating the workspace states
-        public void DeleteElement(VisualElement element, int index=-1) {
+        public void DeleteElement(VisualElement element, int index = -1)
+        {
             index = index == -1 ? this.stateIndex : index;
-            for (int i = index; i < this.stateHistory_.Count; i++) {
+            for (int i = index; i < this.stateHistory_.Count; i++)
+            {
                 this.stateHistory_[i].RemoveState(element);
             }
             element.gameObject.transform.localScale = Vector3.zero;
@@ -187,25 +285,29 @@ namespace VirtualDemonstrator
         /// Adds element to collection of selected visual elements.
         /// Then updates parents of elements, to keep selected elements
         /// as child of one parent.
-        public void AddSelectedElement(VisualElement element) {
+        public void AddSelectedElement(VisualElement element)
+        {
             element.SelectEntered();
             this.selectedVisualElements_.Add(element);
             this.UpdateSelectionParentPosition();
             element.transform.SetParent(this.selectionParent);
         }
-        
+
         /// Remove element from collection of selected visual element.
         /// Then update parents of elements, to keep selected elements
         /// as child of one parent.
-        public void RemoveSelectedElement(VisualElement element) {
+        public void RemoveSelectedElement(VisualElement element)
+        {
             element.SelectExited();
             this.selectedVisualElements_.Remove(element);
             this.UpdateSelectionParentPosition();
             element.transform.SetParent(this.nonSelectionParent);
         }
 
-        public void DeleteSelectedElements(int index=-1) {
-            foreach(VisualElement element in selectedVisualElements_) {
+        public void DeleteSelectedElements(int index = -1)
+        {
+            foreach (VisualElement element in selectedVisualElements_)
+            {
                 DeleteElement(element, index);
             }
             ClearSelectedElements();
@@ -213,15 +315,19 @@ namespace VirtualDemonstrator
 
         /// Updates the states of all selected elements by calling
         /// element.UpdateState()
-        public void UpdateSelectedElementStates() {
-            foreach(VisualElement element in this.selectedVisualElements_) {
+        public void UpdateSelectedElementStates()
+        {
+            foreach (VisualElement element in this.selectedVisualElements_)
+            {
                 element.UpdateState();
             }
         }
 
         /// Removes all elements from collection and resets their parents.
-        public void ClearSelectedElements() {
-            foreach(VisualElement element in this.selectedVisualElements_) {
+        public void ClearSelectedElements()
+        {
+            foreach (VisualElement element in this.selectedVisualElements_)
+            {
                 element.SelectExited();
                 element.transform.SetParent(this.nonSelectionParent);
             }
@@ -230,33 +336,41 @@ namespace VirtualDemonstrator
             this.selectionParent.localScale = Vector3.one;
         }
 
-        public void CopySelectedForward() {
-            foreach(WorkspaceState state in GetStatesAfterCurrent()) {
-                foreach(VisualElement element in this.selectedVisualElements_) {
+        public void CopySelectedForward()
+        {
+            foreach (WorkspaceState state in GetStatesAfterCurrent())
+            {
+                foreach (VisualElement element in this.selectedVisualElements_)
+                {
                     state.AddState(element);
                 }
             }
         }
 
-        public void DuplicateSelected() {
+        public void DuplicateSelected()
+        {
             HashSet<VisualElement> duplicates = new HashSet<VisualElement>();
-            foreach(VisualElement element in this.selectedVisualElements_) {
+            foreach (VisualElement element in this.selectedVisualElements_)
+            {
                 element.SelectExited();
                 element.transform.SetParent(this.nonSelectionParent);
-                GameObject duplicate = Instantiate(element.gameObject, element.transform.position + Vector3.one*0.1f, element.transform.rotation, nonSelectionParent);
+                GameObject duplicate = Instantiate(element.gameObject, element.transform.position + Vector3.one * 0.1f, element.transform.rotation, nonSelectionParent);
                 VisualElement duplicateElement = duplicate.GetComponent<VisualElement>();
                 duplicates.Add(duplicateElement);
-                InsertNewElement(duplicateElement);
+                InsertNewElement(duplicateElement, allElements[element]);
             }
             ClearSelectedElements();
-            foreach(VisualElement duplicate in duplicates) {
+            foreach (VisualElement duplicate in duplicates)
+            {
                 AddSelectedElement(duplicate);
             }
             UpdateSelectionParentPosition();
         }
 
-        public void SetColorSelected(Material mat) {
-            foreach(VisualElement element in this.selectedVisualElements_) {
+        public void SetColorSelected(Material mat)
+        {
+            foreach (VisualElement element in this.selectedVisualElements_)
+            {
                 // set the material for state & the gameobject
                 VisualElementState state = this._curState.elementStates[element];
                 state.SetStateMaterial(mat);
@@ -270,15 +384,17 @@ namespace VirtualDemonstrator
         {
             // Create the new state based on the current workspace conditions.
             WorkspaceState state;
-            if (this._curState == null) {
+            if (this._curState == null)
+            {
                 state = new WorkspaceState();
             }
-            else {
+            else
+            {
                 state = new WorkspaceState(this._curState);
             }
             this._prevState = this._curState;
             this._curState = state;
-            
+
 
             if (index < 0)
             {
@@ -302,10 +418,14 @@ namespace VirtualDemonstrator
                 return false;
             }
             this.stateHistory_.RemoveAt(index);
-            if (index < this.stateIndex) {
+            if (index < this.stateIndex)
+            {
                 this.stateIndex -= 1;
-            } else if (index == this.stateIndex) {
-                if (index > 0) {
+            }
+            else if (index == this.stateIndex)
+            {
+                if (index > 0)
+                {
                     this.stateIndex -= 1;
                 }
                 this._curState = this.stateHistory_[stateIndex];
@@ -318,21 +438,24 @@ namespace VirtualDemonstrator
 
         public WorkspaceState GetStateAtTime(int stateIndex)
         {
-            if (this.stateHistory_.Count == 0) {
+            if (this.stateHistory_.Count == 0)
+            {
                 return null;
             }
             return this.stateHistory_[stateIndex];
         }
 
-        public void RequestNextSlide() {
-            if (goalStateFrame != startStateFrame || this.stateIndex == this.stateHistory_.Count - 1) {
+        public void RequestNextSlide()
+        {
+            if (goalStateFrame != startStateFrame || this.stateIndex == this.stateHistory_.Count - 1)
+            {
                 return;
             }
             int index = this.stateIndex + 1;
             this._prevState = this._curState;
             this.startStateFrame = this.stateIndex;
             this.goalStateFrame = index;
-            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index - stateIndex) * 1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
             // refresh selection, remove any elements that aren't in the current state
@@ -340,15 +463,17 @@ namespace VirtualDemonstrator
             timeline.SetSlider(index);
         }
 
-        public void ReqeuestPreviousSlide() {
-            if (goalStateFrame != startStateFrame || this.stateIndex == 0) {
+        public void ReqeuestPreviousSlide()
+        {
+            if (goalStateFrame != startStateFrame || this.stateIndex == 0)
+            {
                 return;
             }
             int index = this.stateIndex - 1;
             this._prevState = this._curState;
             this.startStateFrame = this.stateIndex;
             this.goalStateFrame = index;
-            this.stateIndex = stateIndex + (int)Mathf.Sign(index-stateIndex)*1;
+            this.stateIndex = stateIndex + (int)Mathf.Sign(index - stateIndex) * 1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
             // refresh selection, remove any elements that aren't in the current state
@@ -356,12 +481,14 @@ namespace VirtualDemonstrator
             timeline.SetSlider(index);
         }
 
-        public void UpdateCurrentState(float t) {
+        public void UpdateCurrentState(float t)
+        {
             // set the transforms
             this._curState.updateAllStates(this._prevState, t);
         }
 
-        public void toggleMode(InteractionModes mode) {
+        public void toggleMode(InteractionModes mode)
+        {
             // Handle change in mode
             print("toggling");
         }
@@ -371,28 +498,33 @@ namespace VirtualDemonstrator
             return this._curState;
         }
 
-        public List<WorkspaceState> GetStatesAfterCurrent() {
+        public List<WorkspaceState> GetStatesAfterCurrent()
+        {
             int cnt = this.stateHistory_.Count - this.stateIndex;
             return this.stateHistory_.GetRange(this.stateIndex, cnt);
         }
 
-        public void HideMenuAndTimeline(bool hide) {
+        public void HideMenuAndTimeline(bool hide)
+        {
             menuPanel.gameObject.SetActive(!hide);
             timeline.gameObject.SetActive(!hide);
         }
 
-        public void KeyboardMode(bool active) {
+        public void KeyboardMode(bool active)
+        {
             HideMenuAndTimeline(active);
             rayInteractor.GetComponent<XRRayInteractor>().maxRaycastDistance = active ? 0f : 30f;
             rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = !active;
         }
 
-        public void AttachMenu(VisualElement element) {
+        public void AttachMenu(VisualElement element)
+        {
             bool showEdit = element.GetType().Equals(typeof(TextElement));
             radialMenu.Attach(selectionParent, element.transform, showEdit);
         }
 
-        public void DetachMenu() {
+        public void DetachMenu()
+        {
             radialMenu.Detach();
         }
     }

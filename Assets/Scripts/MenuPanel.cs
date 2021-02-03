@@ -8,9 +8,9 @@ namespace VirtualDemonstrator {
             cubeMaker_.menu_ = this;
         }
 
-        public void AddElement(VisualElement element)
+        public void AddElement(VisualElement element, UnityEngine.Object prefab)
         {
-            workspace_.InsertNewElement(element);
+            workspace_.InsertNewElement(element, prefab);
         }
 
         public VisualElementInstantiator cubeMaker_;
