@@ -1,48 +1,42 @@
 {
   "Elements": {
     "element_-32640": "Ramp Variant",
-    "element_-44086": "Feather Variant"
+    "element_-44086": "Feather Variant",
+    "element_-96996": "Text VisualElement"
   },
   "States": [
     [
       {
         "ElementName": "element_-32640",
-        "Position": "0.2974222 1.475288 3.222947",
-        "Scale": "0.2000075 0.2 0.2000073",
-        "Rotation": "0.2175677 -0.7982547 0.2358894 -0.5097155",
+        "Position": "0.07569466 1.303567 0.6592513",
+        "Scale": "0.05028338 0.2000035 0.2000223",
+        "Rotation": "0.2457398 -0.6083826 -0.3236811 -0.6816988",
         "Material": "Red"
+      },
+      {
+        "ElementName": "element_-96996",
+        "Position": "0.05957298 1.574315 1.209317",
+        "Scale": "1.000003 1.000003 1.000002",
+        "Rotation": "0.03598406 0.02572475 -0.002811765 -0.9990173",
+        "Material": "White",
+        "Text": "<#000000>whats so great about the triangle?</color><#808080></color>"
       }
     ],
     [
       {
         "ElementName": "element_-32640",
-        "Position": "0.2974222 1.475288 3.222947",
-        "Scale": "0.2000075 0.2 0.2000073",
-        "Rotation": "0.2175677 -0.7982547 0.2358894 -0.5097155",
+        "Position": "0.0579653 1.384434 1.188281",
+        "Scale": "0.05028319 0.2000032 0.2000217",
+        "Rotation": "0.2548287 -0.6268123 -0.30644 -0.6695247",
         "Material": "Red"
       },
       {
-        "ElementName": "element_-44086",
-        "Position": "-0.09887806 1.309043 2.990365",
-        "Scale": "0.2000051 0.200001 0.2000049",
-        "Rotation": "0.09944876 -0.7388723 -0.2626584 -0.6125261",
-        "Material": "White"
-      }
-    ],
-    [
-      {
-        "ElementName": "element_-32640",
-        "Position": "0.2974222 1.475288 3.222947",
-        "Scale": "0.2000075 0.2 0.2000073",
-        "Rotation": "0.2175677 -0.7982547 0.2358894 -0.5097155",
-        "Material": "Red"
-      },
-      {
-        "ElementName": "element_-44086",
-        "Position": "0.8938423 1.321135 2.94033",
-        "Scale": "0.2000069 0.2000012 0.2000067",
-        "Rotation": "0.026604 -0.8338665 -0.2469956 -0.4929018",
-        "Material": "White"
+        "ElementName": "element_-96996",
+        "Position": "0.05957298 1.574315 1.209317",
+        "Scale": "1.000003 1.000003 1.000002",
+        "Rotation": "0.03598406 0.02572475 -0.002811765 -0.9990173",
+        "Material": "White",
+        "Text": "<#000000>whats so great about the triangle?</color><#808080></color>"
       }
     ]
   ]

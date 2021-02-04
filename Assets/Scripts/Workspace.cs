@@ -352,7 +352,11 @@ namespace VirtualDemonstrator
                         // Color
                         var color = vizState.GetStateMaterial();
                         writer.WritePropertyName("Material");
-                        writer.WriteValue(color.name.Replace(" (Instance)", "")); // material name to access in resources
+                        if (color != null) {
+                            writer.WriteValue(color.name.Replace(" (Instance)", "")); // material name to access in resources
+                        } else {
+                            writer.WriteValue("White");
+                        }
 
                         // TODO: checking for child count to get text elements is total hack
                         if (vizState.GetStateElement().transform.childCount > 0)
