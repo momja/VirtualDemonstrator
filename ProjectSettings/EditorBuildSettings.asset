@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/VirtualDemonstrator.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/PresenterMode.unity
+    guid: 8bd9aa154d8734249ac6151519808575
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 1ec7585efe11cc043ae3fca878a635cf,
       type: 2}

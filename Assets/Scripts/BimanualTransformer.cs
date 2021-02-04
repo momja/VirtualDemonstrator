@@ -25,6 +25,10 @@ namespace VirtualDemonstrator
             this.xrInteractionManager = FindObjectOfType<XRInteractionManager>();
         }
 
+        private void Awake() {
+            this.recessiveController.TryGetFeatureValue(CommonUsages.secondaryButton, out this.modeButton);
+        }
+
         // Update is called once per frame
         private void Update()
         {
@@ -47,6 +51,14 @@ namespace VirtualDemonstrator
             {
                 ConnectController();
                 return;
+            }
+
+            // Handle presentation mode switching presenting <=> creating
+            bool prevModeButton = modeButton;
+            recessiveController.TryGetFeatureValue(CommonUsages.secondaryButton, out modeButton);
+            if (modeButton && !prevModeButton) {
+                // toggle modes
+                Workspace.Instance.ToggleModes();
             }
 
             // Get controller midpoint for scaling helper
@@ -376,6 +388,7 @@ namespace VirtualDemonstrator
         private bool recessiveGripDown = false;
         private float trigger = 0f;
         private Vector2 thumbstick;
+        private bool modeButton = false;
         // This value is true when the left controller loses connection.
         private bool reconnecting = true;
 

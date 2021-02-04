@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.EventSystems;
@@ -15,10 +16,10 @@ using Newtonsoft.Json.Linq;
 namespace VirtualDemonstrator
 {
 
-    public enum InteractionModes
+    public enum WorkspaceModes
     {
-        Create,
-        Present
+        Create = 0,
+        Present = 1
     }
     /// <summary>
     /// Main Driver class for the virtual demonstrator.
@@ -45,6 +46,7 @@ namespace VirtualDemonstrator
         public GameObject rayInteractor;
         public Transform selectionParent;
         public Transform nonSelectionParent;
+        public WorkspaceModes curMode = WorkspaceModes.Create;
         private List<WorkspaceState> stateHistory_;
         private HashSet<VisualElement> selectedVisualElements_;
         private float prevSliderValue;
@@ -67,7 +69,9 @@ namespace VirtualDemonstrator
             this.timeline.workspace = this;
             this.menuPanel.workspace_ = this;
             this.workspaceBounds = GameObject.Find("Workspace Bounds").GetComponent<WorkspaceBounds>();
-            InsertNewState();
+            //InsertNewState();
+            _prevState = _curState;
+            LoadWorkspace();
         }
 
         private void Awake()
@@ -87,7 +91,7 @@ namespace VirtualDemonstrator
         {
             if (goalStateFrame != startStateFrame)
             {
-                this.lerpT += 0.01f * Mathf.Abs(goalStateFrame - startStateFrame);
+                this.lerpT += 0.02f * Mathf.Abs(goalStateFrame - startStateFrame);
                 float t = Easings.easeInOut(this.lerpT);
                 if (this.lerpT > 1)
                 {
@@ -171,9 +175,25 @@ namespace VirtualDemonstrator
             this.selectedVisualElements_ = newSelection;
         }
 
+        public void ToggleModes()
+        {
+            if (curMode == WorkspaceModes.Create)
+            {
+                SaveWorkspace();
+                curMode = WorkspaceModes.Present;
+                SceneManager.LoadScene("PresenterMode");
+            }
+            else if (curMode == WorkspaceModes.Present)
+            {
+                curMode = WorkspaceModes.Create;
+                SceneManager.LoadScene("VirtualDemonstrator");
+            }
+        }
+
         /// Parse a JSON file into Workspace states
         [MenuItem("Tools/Load Workspace")]
-        static public void LoadWorkspace() {
+        static public void LoadWorkspace()
+        {
             string filename = "./workspace_save.json";
             JObject json = JObject.Parse(File.ReadAllText(filename));
             JObject elements = (JObject)json["Elements"];
@@ -202,11 +222,13 @@ namespace VirtualDemonstrator
 
             int index = 0;
             // WorkspaceStates (arrays)
-            foreach (JArray a in states.Children<JArray>()) {
+            foreach (JArray a in states.Children<JArray>())
+            {
                 Instance.InsertNewState(index);
                 WorkspaceState WSState = Instance.GetStateAtTime(index);
                 // VisualElementStates (arrays)
-                foreach (JObject o in a.Children<JObject>()) {
+                foreach (JObject o in a.Children<JObject>())
+                {
                     // VisualElements (objects)
                     List<JProperty> properties = o.Properties().ToList<JProperty>();
 
@@ -241,6 +263,15 @@ namespace VirtualDemonstrator
                     string material_name = (string)properties[4].Value;
                     material = Resources.Load<Material>($"Materials/{material_name}");
 
+                    // text
+                    string text = "";
+                    if (properties.Count > 5)
+                    {
+                        text = (string)properties[5].Value;
+                        TextElement te = (TextElement)element;
+                        te.text.text = text;
+                    }
+
                     // create new state
                     WSState.AddState(element);
                     // populate new state variables
@@ -249,13 +280,17 @@ namespace VirtualDemonstrator
                     VEState.SetStateScale(scale);
                     VEState.SetStateRotation(rotation);
                     VEState.SetStateMaterial(material);
+                    if (properties.Count > 5)
+                    {
+
+                    }
                 }
                 index++;
             }
-            Instance.timeline.setStateCount(index);
             Instance.timeline.UpdateMarkers();
             Instance._curState = Instance.GetStateAtTime(0);
             Instance.stateIndex = 0;
+            Instance._prevState = Instance._curState;
             Instance.UpdateCurrentState(1);
         }
 
@@ -278,7 +313,8 @@ namespace VirtualDemonstrator
 
                 writer.WritePropertyName("Elements");
                 writer.WriteStartObject();
-                foreach (KeyValuePair<VisualElement, UnityEngine.Object> pair in Instance.allElements) {
+                foreach (KeyValuePair<VisualElement, UnityEngine.Object> pair in Instance.allElements)
+                {
                     writer.WritePropertyName(pair.Key.gameObject.name);
                     writer.WriteValue(pair.Key.prefabPath);
                 }
@@ -292,7 +328,7 @@ namespace VirtualDemonstrator
                     foreach (VisualElementState vizState in state.elementStates.Values)
                     {
                         writer.WriteStartObject();
-                        
+
                         // Name
                         var name = vizState.GetStateElement().name;
                         writer.WritePropertyName("ElementName");
@@ -319,7 +355,8 @@ namespace VirtualDemonstrator
                         writer.WriteValue(color.name.Replace(" (Instance)", "")); // material name to access in resources
 
                         // TODO: checking for child count to get text elements is total hack
-                        if (vizState.GetStateElement().transform.childCount > 0) {
+                        if (vizState.GetStateElement().transform.childCount > 0)
+                        {
                             // Text element
                             var textElement = (TextElement)vizState.GetStateElement();
                             writer.WritePropertyName("Text");
@@ -550,9 +587,15 @@ namespace VirtualDemonstrator
             this.stateIndex = stateIndex + (int)Mathf.Sign(index - stateIndex) * 1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
-            // refresh selection, remove any elements that aren't in the current state
-            RefreshSelection();
             timeline.SetSlider(index);
+            
+            // refresh selection, remove any elements that aren't in the current state
+            try {
+                RefreshSelection();
+            }
+            catch {
+
+            }
         }
 
         public void ReqeuestPreviousSlide()
@@ -568,21 +611,20 @@ namespace VirtualDemonstrator
             this.stateIndex = stateIndex + (int)Mathf.Sign(index - stateIndex) * 1;
             this._curState = GetStateAtTime(stateIndex);
             this.lerpT = 0;
-            // refresh selection, remove any elements that aren't in the current state
-            RefreshSelection();
             timeline.SetSlider(index);
+            // refresh selection, remove any elements that aren't in the current state
+            try {
+                RefreshSelection();
+            }
+            catch {
+
+            }
         }
 
         public void UpdateCurrentState(float t)
         {
             // set the transforms
             this._curState.updateAllStates(this._prevState, t);
-        }
-
-        public void toggleMode(InteractionModes mode)
-        {
-            // Handle change in mode
-            print("toggling");
         }
 
         public WorkspaceState GetCurrentState()
@@ -598,8 +640,10 @@ namespace VirtualDemonstrator
 
         public void HideMenuAndTimeline(bool hide)
         {
-            menuPanel.gameObject.SetActive(!hide);
-            timeline.gameObject.SetActive(!hide);
+            if (curMode != WorkspaceModes.Present) {
+                menuPanel.gameObject.SetActive(!hide);
+                timeline.gameObject.SetActive(!hide);
+            }
         }
 
         public void KeyboardMode(bool active)

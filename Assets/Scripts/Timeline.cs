@@ -8,15 +8,13 @@ namespace VirtualDemonstrator {
         
         // public toggleModeButton toggleButton;
         public Workspace workspace;
-        public float curTime;
-        public int stateCount;
+        public float curTime = 0;
+        public int stateCount = 1;
         public TimelineSlider slider;
 
         private void Start() {
-            this.curTime = 0;
-            this.stateCount = 1;
             this.slider.timelineDelegate = this;
-            this.slider.slider.maxValue = this.stateCount;
+            this.slider.slider.maxValue = this.stateCount - 1;
         }
 
         private void Update() {
@@ -27,9 +25,9 @@ namespace VirtualDemonstrator {
             this.workspace.OnTimelineChanged((int)slider.slider.value);
         }
 
-        public void toggleMode(InteractionModes mode) {
-            this.workspace.toggleMode(mode);
-        }
+        //public void toggleMode(InteractionModes mode) {
+        //    this.workspace.toggleMode(mode);
+        //}
 
         public void addStateToWorkspace() {
             print("Adding New State");
