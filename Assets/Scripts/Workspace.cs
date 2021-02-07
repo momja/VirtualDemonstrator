@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -191,7 +191,7 @@ namespace VirtualDemonstrator
         }
 
         /// Parse a JSON file into Workspace states
-        [MenuItem("Tools/Load Workspace")]
+        //[MenuItem("Tools/Load Workspace")]
         static public void LoadWorkspace()
         {
             string filename = "./workspace_save.json";
@@ -295,7 +295,7 @@ namespace VirtualDemonstrator
         }
 
         /// Saves workspace as a json file
-        [MenuItem("Tools/Save Workspace")]
+        //[MenuItem("Tools/Save Workspace")]
         static public void SaveWorkspace()
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -352,7 +352,7 @@ namespace VirtualDemonstrator
                         // Color
                         var color = vizState.GetStateMaterial();
                         writer.WritePropertyName("Material");
-                        if (color != null) {
+                        if (color != null && color.name != "Lit") {
                             writer.WriteValue(color.name.Replace(" (Instance)", "")); // material name to access in resources
                         } else {
                             writer.WriteValue("White");

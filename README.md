@@ -9,6 +9,9 @@ Authors
 - Kiet Tran
 - Evan Suma Rosenberg 
 
+## Asset sources
+[Link](https://github.com/momja/VirtualDemonstrator/blob/IEEE_VR_2021/Asset_Sources.txt)
+
 ## Usages
 Virtual Demonstrator is a spatial environment for creating presentations that improves upon slideware technology like PowerPoint for expressing spatial concepts. There are several components that make up the users interaction space.
 
